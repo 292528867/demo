@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * Created by Administrator on 2017/8/8.
  */
+@ApiIgnore
 @RestController
 @RequestMapping("/secure")
 public class SecureController {

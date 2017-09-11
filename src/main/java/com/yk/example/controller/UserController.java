@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.ServletException;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
 /**
  * Created by Administrator on 2017/8/8.
  */
+@ApiIgnore
 @CrossOrigin(origins = "http://localhost", maxAge = 3600)
 @RestController
 @RequestMapping("/user")

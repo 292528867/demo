@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * Created by Administrator on 2017/8/22.
@@ -26,6 +27,7 @@ public class OrderController {
         return orderService.save(order);
     }
 
+    @ApiIgnore
     @RequestMapping(value = "findOne/{id}",method = RequestMethod.GET)
     @ResponseBody
     public Object findOne(@PathVariable long id) {
