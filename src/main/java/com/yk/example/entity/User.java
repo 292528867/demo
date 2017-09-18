@@ -21,6 +21,8 @@ public class User {
     private String email;
     private String password;
 
+    private String userName;
+
     @CreationTimestamp
     private Date created;
 
@@ -70,5 +72,13 @@ public class User {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

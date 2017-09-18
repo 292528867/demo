@@ -1,5 +1,6 @@
 package com.yk.example.controller;
 
+import com.yk.example.entity.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,12 @@ public class LoginController {
     @RequestMapping(value = "hello",method = RequestMethod.GET)
     public String hello(Model model, @RequestParam(value="name", required=false, defaultValue="World") String name) {
         model.addAttribute("name", name);
-        return "hello";
+        return "index";
+    }
+
+    @RequestMapping(value = "/login",method = RequestMethod.POST)
+    public String hello(Model model, User user) {
+        model.addAttribute("name", user.getUserName());
+        return "index";
     }
 }
