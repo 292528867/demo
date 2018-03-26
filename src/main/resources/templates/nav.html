@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8"/>
+<title>Insert title here</title>
+</head>
+<body>
+	<nav class="navbar-default navbar-static-side" role="navigation" th:fragment="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element"> 
+                    	<span>
+                            <img alt="image" class="img-circle" th:src="@{/img/profile_small.jpg}" />
+						</span>
+                    	<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear"> 
+                            	<span class="block m-t-xs">
+                            		<strong class="font-bold">admin</strong>
+                             	</span> 
+                             </span>
+                     	</a>
+                    </div>
+                    <div class="logo-element">
+                        MOXI
+                    </div>
+                </li>
+                <li>
+                    <a th:href="@{dashboard}"><i class="fa fa-diamond"></i> <span class="nav-label">首页</span></a>
+                </li>
+                <li id="news">
+                    <a th:href="@{dashboard}"><i class="fa fa-diamond"></i> <span class="nav-label">用户管理</span></a>
+                </li>
+                <li>
+                    <a th:href="@{dashboard}"><i class="fa fa-files-o"></i> <span class="nav-label">信息管理</span></a>
+                </li>
+                <li>
+                    <a th:href="@{dashboard}"><i class="fa fa-edit"></i> <span class="nav-label">推广管理</span></a>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-diamond"></i> <span class="nav-label">其他</span></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</body>
+</html>
+
+
+

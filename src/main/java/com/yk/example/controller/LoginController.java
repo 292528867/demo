@@ -28,6 +28,6 @@ public class LoginController {
     @RequestMapping(value = "/login",method = RequestMethod.POST)
     public String hello(Model model, User user) {
         model.addAttribute("name", user.getNickName());
-        return "index";
+        return "dashboard";
     }
 }
