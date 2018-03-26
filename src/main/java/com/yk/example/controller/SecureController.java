@@ -27,7 +27,7 @@ public class SecureController {
 
     @RequestMapping(value = "/user/email", method = RequestMethod.POST)
     public User findByEmail(@RequestBody String email) {
-        return userService.findByEmail(email);
+        return null;
     }
 
     @RequestMapping(value = "/user/update", method = RequestMethod.POST)

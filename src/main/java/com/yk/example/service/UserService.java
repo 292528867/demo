@@ -18,7 +18,5 @@ public class UserService {
         return userDao.save(user);
     }
 
-    public User findByEmail(String email) {
-        return userDao.findByEmail(email);
-    }
+
 }

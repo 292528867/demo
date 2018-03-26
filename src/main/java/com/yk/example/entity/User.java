@@ -1,61 +1,67 @@
 package com.yk.example.entity;
 
+import com.yk.example.enums.Sex;
+import com.yk.example.enums.UserType;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by Administrator on 2017/8/8.
  */
 @Entity
+@Table(name = "t_user")
+
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long userId;
-    private String firstName;
-    private String lastName;
-    private String email;
+    @GenericGenerator(name = "idGenerator", strategy = "uuid")
+    @GeneratedValue(generator = "idGenerator")
+    private String userId;
+
+    @Column(name = "phone", columnDefinition = "varchar(50) COMMENT '手机号码'")
+    private String phone;
+
+    @Column(name = "password", columnDefinition = "varchar(50) COMMENT '密码'")
     private String password;
 
-    private String userName;
+    @Column(name = "nick_name", columnDefinition = "varchar(100) COMMENT '用户名'")
+    private String nickName;
+
+    @Column(name = "head_img_url", columnDefinition = "varchar(100) COMMENT '用户图像'")
+    private String headImgUrl;
+
+    @Column(name = "sex", columnDefinition = "varchar(100) COMMENT '0为男性，1为女性,2未知'")
+    private Sex sex;
+
+    @Column(name = "third_user_id", columnDefinition = "varchar(100) COMMENT '第三方平台唯一标识符'")
+    private String thirdUserId;
+
+    @Column(name = "user_type", columnDefinition = "varchar(100) COMMENT '用户类型 0 app用户 1 微信 2 qq 3 微博'")
+    private UserType userType;
 
     @CreationTimestamp
-    private Date created;
+    private Date createTime;
 
-    public Long getUserId() {
+    @UpdateTimestamp
+    private Date updateTime;
+
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getPassword() {
@@ -66,19 +72,51 @@ public class User {
         this.password = password;
     }
 
-    public Date getCreated() {
-        return created;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getHeadImgUrl() {
+        return headImgUrl;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setHeadImgUrl(String headImgUrl) {
+        this.headImgUrl = headImgUrl;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
+    }
+
+    public String getThirdUserId() {
+        return thirdUserId;
+    }
+
+    public void setThirdUserId(String thirdUserId) {
+        this.thirdUserId = thirdUserId;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }
