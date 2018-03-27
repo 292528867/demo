@@ -42,6 +42,9 @@ public class User {
     @Column(name = "user_type", columnDefinition = "varchar(100) COMMENT '用户类型 0 app用户 1 微信 2 qq 3 微博' ")
     private UserType userType;
 
+    @Column(name = "rong_cloud_token", columnDefinition = "varchar(100) COMMENT '用户在融云的唯一token' ")
+    private String rongCloudToken;
+
     @Column(name = "is_valid", columnDefinition = "varchar(100) COMMENT '用户类型 0 有效用户 1 无效用户' ")
     private String isValid = "0";
 
@@ -137,5 +140,13 @@ public class User {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getRongCloudToken() {
+        return rongCloudToken;
+    }
+
+    public void setRongCloudToken(String rongCloudToken) {
+        this.rongCloudToken = rongCloudToken;
     }
 }
