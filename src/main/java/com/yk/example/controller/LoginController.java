@@ -14,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @Controller
 public class LoginController {
 
-    @RequestMapping("/")
+    @RequestMapping("")
     public String index(){
         return "login";
     }
@@ -25,7 +25,7 @@ public class LoginController {
         return "hello";
     }
 
-    @RequestMapping(value = "/login",method = RequestMethod.POST)
+    @RequestMapping(value = "/admin",method = RequestMethod.POST)
     public String hello(Model model, User user) {
         model.addAttribute("name", user.getNickName());
         return "dashboard";

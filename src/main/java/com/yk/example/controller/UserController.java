@@ -26,8 +26,6 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/8/8.
  */
-@ApiIgnore
-@CrossOrigin(origins = "http://localhost", maxAge = 3600)
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -63,26 +61,6 @@ public class UserController {
         }
     }
 
-    /**
-     * 动态查询所有用户信息
-     *
-     * @param user
-     * @return
-     */
-    @RequestMapping(value = "findAllUser", method = RequestMethod.GET)
-    public ControllerResult findAllUser(User user, Pageable pageable) {
-        Specification<User> specification = new Specification<User>() {
-            @Override
-            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-                List<Predicate> predicates = new ArrayList<>(); //所有的断言
-                if (StringUtils.isNoneBlank(user.getPhone())) {
-                    predicates.add(criteriaBuilder.like(root.get("phone").as(String.class), user.getPhone() + "%"));
-                }
-                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-            }
-        };
-        return new ControllerResult().setRet_code(0).setRet_values(userDao.findAll(specification, pageable));
-    }
 
 
 

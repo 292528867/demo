@@ -21,26 +21,29 @@ public class User {
     @GeneratedValue(generator = "idGenerator")
     private String userId;
 
-    @Column(name = "phone", columnDefinition = "varchar(50) COMMENT '手机号码'")
+    @Column(name = "phone", columnDefinition = "varchar(50) COMMENT '手机号码' ")
     private String phone;
 
-    @Column(name = "password", columnDefinition = "varchar(50) COMMENT '密码'")
+    @Column(name = "password", columnDefinition = "varchar(50) COMMENT '密码' ")
     private String password;
 
-    @Column(name = "nick_name", columnDefinition = "varchar(100) COMMENT '用户名'")
+    @Column(name = "nick_name", columnDefinition = "varchar(100) COMMENT '用户名' ")
     private String nickName;
 
-    @Column(name = "head_img_url", columnDefinition = "varchar(100) COMMENT '用户图像'")
+    @Column(name = "head_img_url", columnDefinition = "varchar(100) COMMENT '用户图像' ")
     private String headImgUrl;
 
-    @Column(name = "sex", columnDefinition = "varchar(100) COMMENT '0为男性，1为女性,2未知'")
+    @Column(name = "sex", columnDefinition = "varchar(100) COMMENT '0为男性，1为女性,2未知' ")
     private Sex sex;
 
-    @Column(name = "third_user_id", columnDefinition = "varchar(100) COMMENT '第三方平台唯一标识符'")
+    @Column(name = "third_user_id", columnDefinition = "varchar(100) COMMENT '第三方平台唯一标识符' ")
     private String thirdUserId;
 
-    @Column(name = "user_type", columnDefinition = "varchar(100) COMMENT '用户类型 0 app用户 1 微信 2 qq 3 微博'")
+    @Column(name = "user_type", columnDefinition = "varchar(100) COMMENT '用户类型 0 app用户 1 微信 2 qq 3 微博' ")
     private UserType userType;
+
+    @Column(name = "is_valid", columnDefinition = "varchar(100) COMMENT '用户类型 0 有效用户 1 无效用户' ")
+    private String isValid = "0";
 
     @CreationTimestamp
     private Date createTime;
@@ -118,5 +121,21 @@ public class User {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(String isValid) {
+        this.isValid = isValid;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }
