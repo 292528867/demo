@@ -11,8 +11,6 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface UserDao extends CrudRepository<User, String>, JpaSpecificationExecutor {
 
-    User save(User user);
-
 
     @Modifying
     @Query(" update User u set u.isValid = ?2 where u.userId = ?1")

@@ -48,6 +48,9 @@ public class User {
     @Column(name = "is_valid", columnDefinition = "varchar(100) COMMENT '用户类型 0 有效用户 1 无效用户' ")
     private String isValid = "0";
 
+    @Column(name = "account_balance", columnDefinition = "DECIMAL(9,2) COMMENT '账号余额' ")
+    private float accountBalance;
+
     @CreationTimestamp
     private Date createTime;
 
@@ -148,5 +151,13 @@ public class User {
 
     public void setRongCloudToken(String rongCloudToken) {
         this.rongCloudToken = rongCloudToken;
+    }
+
+    public float getAccountBalance() {
+        return accountBalance;
+    }
+
+    public void setAccountBalance(float accountBalance) {
+        this.accountBalance = accountBalance;
     }
 }
