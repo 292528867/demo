@@ -151,6 +151,11 @@
             <artifactId>java-vod-upload</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>ccp-sms-sdk</groupId>
+            <artifactId>ccp-sms-sdk</artifactId>
+            <version>2.6.3r</version>
+        </dependency>
 
 
         <dependency>

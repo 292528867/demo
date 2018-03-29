@@ -24,13 +24,13 @@ public class User {
     @Column(name = "phone", columnDefinition = "varchar(50) COMMENT '手机号码' ")
     private String phone;
 
-    @Column(name = "password", columnDefinition = "varchar(50) COMMENT '密码' ")
+    @Column(name = "password", columnDefinition = "varchar(100) COMMENT '密码' ")
     private String password;
 
     @Column(name = "nick_name", columnDefinition = "varchar(100) COMMENT '用户名' ")
     private String nickName;
 
-    @Column(name = "head_img_url", columnDefinition = "varchar(100) COMMENT '用户图像' ")
+    @Column(name = "head_img_url", columnDefinition = "varchar(255) COMMENT '用户图像' ")
     private String headImgUrl;
 
     @Column(name = "sex", columnDefinition = "varchar(100) COMMENT '0为男性，1为女性,2未知' ")
@@ -39,17 +39,23 @@ public class User {
     @Column(name = "third_user_id", columnDefinition = "varchar(100) COMMENT '第三方平台唯一标识符' ")
     private String thirdUserId;
 
-    @Column(name = "user_type", columnDefinition = "varchar(100) COMMENT '用户类型 0 app用户 1 微信 2 qq 3 微博' ")
+    @Column(name = "user_type", columnDefinition = "varchar(2) COMMENT '用户类型 0 app用户 1 微信 2 qq 3 微博' ")
     private UserType userType;
 
     @Column(name = "rong_cloud_token", columnDefinition = "varchar(100) COMMENT '用户在融云的唯一token' ")
     private String rongCloudToken;
 
-    @Column(name = "is_valid", columnDefinition = "varchar(100) COMMENT '用户类型 0 有效用户 1 无效用户' ")
+    @Column(name = "is_valid", columnDefinition = "varchar(2) COMMENT '用户类型 0 有效用户 1 无效用户' ")
     private String isValid = "0";
 
     @Column(name = "account_balance", columnDefinition = "DECIMAL(9,2) COMMENT '账号余额' ")
     private float accountBalance;
+
+    @Column(name = "direct_recommend_user", columnDefinition = "varchar(100) COMMENT '直接推荐人' ")
+    private String directRecommendUser;
+
+    @Column(name = "space_recommend_user", columnDefinition = "varchar(100) COMMENT '推荐人的推荐人' ")
+    private String spaceRecommendUser;
 
     @CreationTimestamp
     private Date createTime;
@@ -159,5 +165,21 @@ public class User {
 
     public void setAccountBalance(float accountBalance) {
         this.accountBalance = accountBalance;
+    }
+
+    public String getDirectRecommendUser() {
+        return directRecommendUser;
+    }
+
+    public void setDirectRecommendUser(String directRecommendUser) {
+        this.directRecommendUser = directRecommendUser;
+    }
+
+    public String getSpaceRecommendUser() {
+        return spaceRecommendUser;
+    }
+
+    public void setSpaceRecommendUser(String spaceRecommendUser) {
+        this.spaceRecommendUser = spaceRecommendUser;
     }
 }

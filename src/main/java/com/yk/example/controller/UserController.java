@@ -3,25 +3,21 @@ package com.yk.example.controller;
 import com.yk.example.dao.UserDao;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.entity.User;
+import com.yk.example.utils.SmsUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import javax.servlet.ServletException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2017/8/8.
@@ -30,11 +26,13 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     private UserDao userDao;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     /**
      * app 用户注册
@@ -61,7 +59,28 @@ public class UserController {
         }
     }
 
-
+    /**
+     * 发送短信验证码
+     *
+     * @param phone
+     * @return
+     */
+    @RequestMapping(value = "sendSms/{phone}")
+    public ControllerResult sendSms(@PathVariable String phone) {
+        if (StringUtils.isBlank(phone)) {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能为空");
+        }
+        String code = RandomStringUtils.randomNumeric(6);
+        boolean result = SmsUtils.sendSms(phone, code);
+        logger.info(new Date() + "发送短信验证码为：" + code);
+        if (result) {
+            // 保存到redis 5分钟后过期
+            redisTemplate.opsForValue().set(phone, code, 5, TimeUnit.MINUTES);
+            return new ControllerResult().setRet_code(0).setRet_values("").setMessage("发送成功，耐心等待");
+        } else {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("发送失败");
+        }
+    }
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
