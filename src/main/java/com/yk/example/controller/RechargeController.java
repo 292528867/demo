@@ -14,7 +14,8 @@ import com.yk.example.entity.RechargeRecord;
 import com.yk.example.enums.PayStatus;
 import com.yk.example.enums.PayType;
 import com.yk.example.service.RechargeService;
-import com.yk.example.utils.WeixinPayUtils;
+import com.yk.example.utils.WXPayUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
@@ -91,8 +93,8 @@ public class RechargeController {
      * @param request
      * @param response
      */
-    @RequestMapping(value = "aliNotify")
-    public String aliNotify(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "aliPayNotify")
+    public String aliPayNotify(HttpServletRequest request, HttpServletResponse response) {
         logger.info("--------支付宝支付通知notify-----");
         //获取支付宝POST过来反馈信息
         Map<String, String> params = new HashMap<String, String>();
@@ -157,21 +159,56 @@ public class RechargeController {
         wxRequestParamMap.put("trade_type", "APP");
         try {
             // 生成签名sign
-            String stringSignTemp = WeixinPayUtils.createLinkString(wxRequestParamMap) + "&key=" + wxconfig.getAppSecret();
-            String sign = WeixinPayUtils.getMessageDigest(stringSignTemp.getBytes("UTF-8")).toUpperCase();
+            String sign = WXPayUtils.generateSignature(wxRequestParamMap, wxconfig.getAppSecret());
             wxRequestParamMap.put("sign", sign);
-            String wxRequestParamXML = WeixinPayUtils.mapToXml(wxRequestParamMap);
+            String wxRequestParamXML = WXPayUtils.mapToXml(wxRequestParamMap);
             logger.info("微信统一订单提交前参数:" + wxRequestParamXML);
             // 请求统一订单接口
             String wxResposeXml = restTemplate.postForObject(wxconfig.getUnifiedorder_url(), wxRequestParamXML, String.class);
-            Map<String, String> resultMap = WeixinPayUtils.xmlToMap(wxResposeXml);
+            Map<String, String> resultMap = WXPayUtils.xmlToMap(wxResposeXml);
             return new ControllerResult().setRet_code(0).setRet_values(resultMap);
         } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new ControllerResult().setRet_code(1).setMessage("微信支付异常");
     }
 
+    /**
+     * 微信回调通知
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "wxPayNotify")
+    public String wxPayNotify(HttpServletRequest request) throws Exception {
+        logger.info("--------微信支付通知notify开始-----");
+        ServletInputStream inputStream = request.getInputStream();
+        Map<String, String> resultMap = new HashMap<>();
+        if (inputStream != null) {
+            String notifyResultXml = IOUtils.toString(inputStream, "UTF-8");
+            logger.info("--------微信支付通知返回结果-----" + notifyResultXml);
+            // 校验签名
+            boolean signatureValid = WXPayUtils.isSignatureValid(notifyResultXml, wxconfig.getAppSecret());
+            if (signatureValid) {
+                Map<String, String> notifyResultMap = WXPayUtils.xmlToMap(notifyResultXml);
+                if (notifyResultMap.get("return_code").equals("SUCCESS")) {
+                    // 支付成功修改订单号状态
+                    rechargeService.updatePayStatus(notifyResultMap.get("out_trade_no"), PayStatus.success);
+                    resultMap.put("return_code", "SUCCESS");
+                    resultMap.put("return_msg", "OK");
+                }
+            } else {
+                resultMap.put("return_code", "FAIL");
+                resultMap.put("return_msg", "签名错误");
+                return WXPayUtils.mapToXml(resultMap);
+            }
 
+        }
+        logger.info("--------微信支付通知notify结束-----");
+        return WXPayUtils.mapToXml(resultMap);
+    }
 
 }

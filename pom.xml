@@ -140,11 +140,29 @@
             <artifactId>ali-server-sdk</artifactId>
             <version>3.0.0</version>
         </dependency>
+        <!-- 本地视频点播 -->
+        <dependency>
+            <groupId>ali-vod</groupId>
+            <artifactId>java-sdk-vod</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ali-vod</groupId>
+            <artifactId>java-vod-upload</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
 
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
         </dependency>
     </dependencies>
 
