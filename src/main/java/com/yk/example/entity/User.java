@@ -42,7 +42,7 @@ public class User {
     @Column(name = "user_type", columnDefinition = "varchar(2) COMMENT '用户类型 0 app用户 1 微信 2 qq 3 微博' ")
     private UserType userType;
 
-    @Column(name = "rong_cloud_token", columnDefinition = "varchar(100) COMMENT '用户在融云的唯一token' ")
+    @Column(name = "rong_cloud_token", columnDefinition = "varchar(255) COMMENT '用户在融云的唯一token' ")
     private String rongCloudToken;
 
     @Column(name = "is_valid", columnDefinition = "varchar(2) COMMENT '用户类型 0 有效用户 1 无效用户' ")

@@ -6,6 +6,7 @@ import com.yk.example.rongCloud.methods.user.User;
 import com.yk.example.rongCloud.models.Result;
 import com.yk.example.rongCloud.models.response.TokenResult;
 import com.yk.example.rongCloud.models.user.UserModel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,12 @@ public class RongCloudUtils {
     public static TokenResult registerRongCloudUser(String userId, String nickName, String headImgUrl){
         RongCloud rongCloud = RongCloud.getInstance(APP_KEY, APP_SECRET);
         User rongCloudUser = rongCloud.user;
+        if(!StringUtils.isNotBlank(nickName)){
+            nickName = "test";
+        }if(!StringUtils.isNotBlank(headImgUrl)){
+            headImgUrl = "https://pic.qqtn.com/up/2018-3/15223765997238966.jpg";
+        }
+
         UserModel user = new UserModel()
                 .setId(userId)
                 .setName(nickName)

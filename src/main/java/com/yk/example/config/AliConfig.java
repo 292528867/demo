@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * Created by yk on 2018/3/28.
  */
 @Component
-@PropertySource(value = "ali.properties")
+@PropertySource(value = "classpath:ali.properties")
 public class AliConfig {
 
     @Value("${APP_ID}")

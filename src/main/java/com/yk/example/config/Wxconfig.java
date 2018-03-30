@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * Created by yk on 2018/3/28.
  */
 @Component
-@PropertySource(value = "wx.properties")
+@PropertySource(value = "classpath:wx.properties")
 public class Wxconfig {
 
     @Value("${AppID}")
