@@ -58,4 +58,11 @@ public class UserService {
         return userDao.findOne(userId);
     }
 
+    public User findByDirectRecommendUser(String directRecommendUserPhone) {
+        return userDao.findByDirectRecommendUser(directRecommendUserPhone);
+    }
+
+    public User findByPhone(String phone) {
+        return userDao.findByPhone(phone);
+    }
 }

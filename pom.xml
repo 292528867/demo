@@ -93,28 +93,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- servlet 依赖包 -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- JSTL (JSP standard Tag Library) JSP 标准标签库 -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-        </dependency>
-        <!-- Tomcat的支持 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <!--  <scope>provided</scope>-->
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <!-- <scope>provided</scope>-->
-        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -128,12 +107,12 @@
             <version>3.6</version>
         </dependency>
 
-        <!-- 本地融云服务端sdk包 -->
+      <!--  &lt;!&ndash; 本地融云服务端sdk包 &ndash;&gt;
         <dependency>
             <groupId>rongCloud</groupId>
             <artifactId>server-sdk</artifactId>
             <version>1.0.0</version>
-        </dependency>
+        </dependency>-->
         <!-- 支付宝serversdk 本地安装 -->
         <dependency>
             <groupId>ali</groupId>
@@ -168,6 +147,40 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
+        </dependency>
+        <!-- jackson json lib -->
+        <!-- jackson json lib -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate4</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.46</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.9</version>
         </dependency>
     </dependencies>
 

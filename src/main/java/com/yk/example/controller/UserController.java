@@ -3,6 +3,9 @@ package com.yk.example.controller;
 import com.yk.example.dao.UserDao;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.entity.User;
+import com.yk.example.enums.UserType;
+import com.yk.example.service.UserService;
+import com.yk.example.utils.Md5Utlls;
 import com.yk.example.utils.SmsUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -32,29 +35,55 @@ public class UserController {
     private UserDao userDao;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     /**
      * app 用户注册
      *
      * @param user
-     * @param code
      * @return
      */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ControllerResult registerUser(User user, String code) {
-        if (StringUtils.isNoneBlank(code)) {
-            if (redisTemplate.opsForValue().get(user.getPhone()).toString().equals(code)) { // 验证码校验
+    public ControllerResult registerUser(@RequestBody  User user) {
+        //有推荐人手机号
+        String directRecommendUserPhone = user.getDirectRecommendUser();
+        if(StringUtils.isNotBlank(directRecommendUserPhone)){
+            User directRecommendUser =  userService.findByDirectRecommendUser(directRecommendUserPhone);
+            if(directRecommendUser == null){
+                return new ControllerResult().setRet_code(1).setRet_values("")
+                        .setMessage("推荐人手机号未注册");
+            }
+            // 设置推荐人的推荐人
+            user.setSpaceRecommendUser(directRecommendUser.getDirectRecommendUser());
+        }
+        // 验证码校验
+        String redisCode = redisTemplate.opsForValue().get(user.getPhone());
+        String code = user.getCode();
+        if (StringUtils.isNoneBlank(redisCode)) {
+            if (redisCode.equals(code)) {
                 // 密码进行md5加密
                 String password = user.getPassword();
+                String newPassword = Md5Utlls.getMD5String(password);
+                user.setPassword(newPassword);
+
+                user.setUserType(UserType.app);
+
+                User newUser = userService.save(user);
+
+                // 生成融云token
+
+
 
                 return new ControllerResult().setRet_code(0)
-                        .setRet_values(userDao.save(user));
+                        .setRet_values(userService.save(newUser));
             }
-            return new ControllerResult().setRet_code(1)
+            return new ControllerResult().setRet_code(1).setRet_values("")
                     .setMessage("验证码错误");
         } else {
-            return new ControllerResult().setRet_code(1)
+            return new ControllerResult().setRet_code(1).setRet_values("")
                     .setMessage("非法的验证码");
         }
     }
@@ -69,6 +98,10 @@ public class UserController {
     public ControllerResult sendSms(@PathVariable String phone) {
         if (StringUtils.isBlank(phone)) {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能为空");
+        }
+        User user =  userService.findByPhone(phone);
+        if(user != null){
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("用户已注册");
         }
         String code = RandomStringUtils.randomNumeric(6);
         boolean result = SmsUtils.sendSms(phone, code);

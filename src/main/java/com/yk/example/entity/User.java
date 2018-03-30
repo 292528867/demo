@@ -63,6 +63,20 @@ public class User {
     @UpdateTimestamp
     private Date updateTime;
 
+    /**
+     *  验证码 （非用户表中字段）
+     */
+    @Transient
+    private String code;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     public String getUserId() {
         return userId;
     }

@@ -1,12 +1,11 @@
 package com.yk.example.utils;
 
-import io.rong.RongCloud;
-import io.rong.methods.user.User;
-import io.rong.models.Result;
-import io.rong.models.message.PrivateMessage;
-import io.rong.models.response.ResponseResult;
-import io.rong.models.response.TokenResult;
-import io.rong.models.user.UserModel;
+
+import com.yk.example.rongCloud.RongCloud;
+import com.yk.example.rongCloud.methods.user.User;
+import com.yk.example.rongCloud.models.Result;
+import com.yk.example.rongCloud.models.response.TokenResult;
+import com.yk.example.rongCloud.models.user.UserModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ public class RongCloudUtils {
      * @param headImgUrl
      * @return
      */
-    public static TokenResult registerRongCloudUser(String userId,String nickName,String headImgUrl){
+    public static TokenResult registerRongCloudUser(String userId, String nickName, String headImgUrl){
         RongCloud rongCloud = RongCloud.getInstance(APP_KEY, APP_SECRET);
         User rongCloudUser = rongCloud.user;
         UserModel user = new UserModel()

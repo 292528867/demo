@@ -15,4 +15,8 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
     @Modifying
     @Query(" update User u set u.isValid = ?2 where u.userId = ?1")
     int updateIsValidByUserId(String userId, String isValid);
+
+    User findByDirectRecommendUser(String directRecommendUserPhone);
+
+    User findByPhone(String phone);
 }
