@@ -12,7 +12,15 @@ public class SmsUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SmsUtils.class);
 
-    public static boolean sendSms(String phone, String code) {
+    /**
+     *  发送短信
+     * @param phone    手机号
+     * @param code     验证码
+     * @param templateNo  模板编号
+     * @param time        验证码时间
+     * @return
+     */
+    public static boolean sendSms(String phone, String code, String templateNo, int time) {
         Map<String, Object> result = null;
 
         CCPRestSmsSDK restAPI = new CCPRestSmsSDK();

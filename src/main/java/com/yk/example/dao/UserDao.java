@@ -19,4 +19,8 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
     User findByDirectRecommendUser(String directRecommendUserPhone);
 
     User findByPhone(String phone);
+
+    @Modifying
+    @Query(" update User u set u.password = ?1 where u.phone = ?2 ")
+    int updatePassword(String password, String phone);
 }

@@ -65,4 +65,9 @@ public class UserService {
     public User findByPhone(String phone) {
         return userDao.findByPhone(phone);
     }
+
+    @Transactional
+    public int updatePassword(String password, String phone) {
+        return userDao.updatePassword(password,phone);
+    }
 }
