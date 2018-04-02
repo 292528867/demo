@@ -111,7 +111,7 @@ public class UserController {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("用户已注册");
         }
         String code = RandomStringUtils.randomNumeric(4);
-        boolean result = SmsUtils.sendSms(phone, code, "1", 5);
+        boolean result = SmsUtils.sendSms(phone, code, "241779", 5);
         logger.info(new Date() + "发送短信验证码为：" + code);
         if (result) {
             // 保存到redis 5分钟后过期
@@ -134,7 +134,7 @@ public class UserController {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能为空");
         }
         String code = RandomStringUtils.randomNumeric(4);
-        boolean result = SmsUtils.sendSms(phone, code, "2", 15);
+        boolean result = SmsUtils.sendSms(phone, code, "241783", 15);
         logger.info(new Date() + "发送短信验证码为：" + code);
         if (result) {
             // 保存到redis 5分钟后过期
@@ -161,7 +161,7 @@ public class UserController {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("该手机号未注册");
         }
         String code = RandomStringUtils.randomNumeric(4);
-        boolean result = SmsUtils.sendSms(phone, code, "3", 15);
+        boolean result = SmsUtils.sendSms(phone, code, "241786", 15);
         logger.info(new Date() + "发送短信验证码为：" + code);
         if (result) {
             // 保存到redis 5分钟后过期
@@ -248,7 +248,7 @@ public class UserController {
         String phone = login.getPhone();
         String password = login.getPassword();
         String redisCode = redisTemplate.opsForValue().get(login.getPhone() + "_update");
-        if (code.equals(redisCode)) {
+        if (!code.equals(redisCode)) {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("验证码错误");
         }
         User user = userService.findByPhone(phone);
