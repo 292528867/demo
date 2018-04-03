@@ -5,6 +5,7 @@ import com.yk.example.dao.UserCashDao;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.entity.UserBankCard;
 import com.yk.example.entity.UserCash;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +30,9 @@ public class BankController {
      * @param cardInfo
      * @return
      */
-    @RequestMapping(value = "add", method = RequestMethod.POST)
-    public ControllerResult add(@RequestBody UserBankCard cardInfo) {
+    @ApiOperation(value="绑定银行卡")
+    @RequestMapping(value = "add/{version}", method = RequestMethod.POST)
+    public ControllerResult add(@RequestBody UserBankCard cardInfo,@PathVariable String version) {
         UserBankCard bankCard = bankDao.save(cardInfo);
         return new ControllerResult().setRet_code(0).setRet_values(bankCard).setMessage("");
     }
@@ -41,20 +43,22 @@ public class BankController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "list/{userId}", method = RequestMethod.GET)
-    public ControllerResult list(@PathVariable String userId) {
+    @ApiOperation(value="查询银行卡列表")
+    @RequestMapping(value = "list/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult list(@PathVariable String userId,@PathVariable String version) {
         List<UserBankCard> bankCards = bankDao.findByUser(userId);
         return new ControllerResult().setRet_code(0).setRet_values(bankCards).setMessage("");
     }
 
     /**
-     * 用户提现记录
+     * 用户提现
      *
      * @param userCash
      * @return
      */
-    @RequestMapping(value = "cash", method = RequestMethod.GET)
-    public ControllerResult cash(@RequestBody UserCash userCash) {
+    @ApiOperation(value="用户提现")
+    @RequestMapping(value = "cash/{version}", method = RequestMethod.GET)
+    public ControllerResult cash(@RequestBody UserCash userCash,@PathVariable String version) {
         UserCash cash = usercashDao.save(userCash);
         return new ControllerResult().setRet_code(0).setRet_values(cash).setMessage("");
     }

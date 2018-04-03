@@ -12,6 +12,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * Created by Administrator on 2017/8/22.
  */
+@ApiIgnore
 @Controller
 @RequestMapping("order")
 public class OrderController {

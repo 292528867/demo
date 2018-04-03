@@ -22,7 +22,7 @@ public class VideoRecord extends BaseEntity {
     @Column(name = "video_url", columnDefinition = " varchar(255) comment '视频url' ")
     private String videoUrl;
 
-    @Column(name = "music_name",columnDefinition = "varchar(50) comment '音乐名称'")
+    @Column(name = "music_name", columnDefinition = "varchar(50) comment '音乐名称'")
     private String musicName;
 
     @Column(name = "music_url", columnDefinition = " varchar(255) comment '音乐url' ")
@@ -34,9 +34,13 @@ public class VideoRecord extends BaseEntity {
     @Column(name = "comment_num", columnDefinition = " numeric(10,0) comment '评论数目' ")
     private String commentNum;
 
-    @ManyToOne(cascade = { CascadeType.ALL })
-    @JoinColumn(name="user_id")
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "tag_id")
+    private VideoTag tag;
 
     @Column(name = "status", columnDefinition = " varchar(2) comment '0 草稿 1 发布' ")
     private String status;
@@ -119,5 +123,13 @@ public class VideoRecord extends BaseEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public VideoTag getTag() {
+        return tag;
+    }
+
+    public void setTag(VideoTag tag) {
+        this.tag = tag;
     }
 }

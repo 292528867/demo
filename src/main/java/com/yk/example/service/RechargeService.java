@@ -32,7 +32,6 @@ public class RechargeService {
         // 修改用户订单的余额
         RechargeRecord rechargeRecord = rechargeDao.findOne(rechargeId);
         User user = userDao.findOne(rechargeRecord.getUser().getUserId());
-        user.setAccountBalance(user.getAccountBalance() + rechargeRecord.getMoney());
         userDao.save(user);
     }
 

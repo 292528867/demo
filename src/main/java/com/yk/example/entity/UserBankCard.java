@@ -1,5 +1,6 @@
 package com.yk.example.entity;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -21,15 +22,19 @@ public class UserBankCard {
     @JoinColumn(name = "user_id" ,columnDefinition = " varchar(50) comment '用户id ' ")
     private User user;
 
+    @ApiModelProperty(value="持卡人",name="userName")
     @JoinColumn(name = "user_name" ,columnDefinition = " varchar(50) comment '持卡人 ' ")
     private String userName;
 
+    @ApiModelProperty(value="银行卡号",name="idNumber")
     @JoinColumn(name = "id_number" ,columnDefinition = " varchar(50) comment '银行卡号 ' ")
     private String idNumber;
 
+    @ApiModelProperty(value="开户行",name="depositBank")
     @JoinColumn(name = "deposit_bank" ,columnDefinition = " varchar(50) comment '开户行 ' ")
     private String depositBank;
 
+    @ApiModelProperty(value="银行名称",name="bankName")
     @JoinColumn(name = "bank_name" ,columnDefinition = " varchar(50) comment '银行名称 ' ")
     private String bankName;
 

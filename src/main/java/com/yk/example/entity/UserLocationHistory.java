@@ -1,11 +1,13 @@
 package com.yk.example.entity;
 
-import javax.persistence.Column;
+import javax.persistence.*;
 
 /**
  * 用户定位历史记录
  * Created by yk on 2018/4/2.
  */
+@Entity
+@Table(name = "t_user_location_history")
 public class UserLocationHistory extends BaseEntity {
 
     @Column(name = "longitude", columnDefinition = " numeric(10,5) comment '经度' ")
@@ -17,6 +19,9 @@ public class UserLocationHistory extends BaseEntity {
     @Column(name = "address", columnDefinition = " varchar(255) comment '地址' ")
     private String address;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", columnDefinition = " varchar(50) comment '用户id ' ")
+    private User user;
 
     public String getLongitude() {
         return longitude;
@@ -40,5 +45,13 @@ public class UserLocationHistory extends BaseEntity {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

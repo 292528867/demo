@@ -7,13 +7,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by yk on 2018/4/2.
  */
 @MappedSuperclass
-public class BaseEntity {
+public class BaseEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GenericGenerator(name = "idGenerator", strategy = "uuid")

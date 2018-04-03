@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ import java.util.*;
 /**
  * Created by yk on 2018/3/28.
  */
+@ApiIgnore
 @RestController
 @RequestMapping("recharge")
 public class RechargeController {

@@ -1,7 +1,9 @@
 package com.yk.example.service;
 
 import com.yk.example.dao.UserDao;
+import com.yk.example.dao.UserInfoDao;
 import com.yk.example.entity.User;
+import com.yk.example.entity.UserInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,8 +29,21 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
-    public User save(User user) {
-        return userDao.save(user);
+    @Autowired
+    private UserInfoDao userInfoDao;
+
+    public User insertUser(User user) {
+        if (StringUtils.isNotBlank(user.getUserId())) {
+            // 修改
+            user = userDao.save(user);
+        } else {
+            // 新增
+            user = userDao.save(user);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUser(user);
+            userInfoDao.save(userInfo);
+        }
+        return user;
     }
 
 
@@ -49,7 +64,7 @@ public class UserService {
         return userDao.findAll(specification, pageable);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updateIsValidByUserId(String userId, String isValid) {
         return userDao.updateIsValidByUserId(userId, isValid);
     }
@@ -68,6 +83,6 @@ public class UserService {
 
     @Transactional
     public int updatePassword(String password, String phone) {
-        return userDao.updatePassword(password,phone);
+        return userDao.updatePassword(password, phone);
     }
 }

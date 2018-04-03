@@ -2,15 +2,18 @@ package com.yk.example.controller;
 
 import com.yk.example.dao.UserDao;
 import com.yk.example.dto.ControllerResult;
+import com.yk.example.dto.UserLocation;
 import com.yk.example.entity.User;
 import com.yk.example.enums.UserType;
 import com.yk.example.rongCloud.models.response.TokenResult;
 import com.yk.example.service.UserService;
+import com.yk.example.service.UserinfoService;
 import com.yk.example.utils.Md5Utlls;
 import com.yk.example.utils.RongCloudUtils;
 import com.yk.example.utils.SmsUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -19,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.ServletException;
 import java.util.Date;
@@ -42,14 +46,18 @@ public class UserController {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private UserinfoService userinfoService;
+
     /**
      * app 用户注册
      *
      * @param user
      * @return
      */
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ControllerResult registerUser(@RequestBody User user) {
+    @ApiOperation(value = "用户注册", notes = "返回的用户实体")
+    @RequestMapping(value = "/register/{version}", method = RequestMethod.POST)
+    public ControllerResult registerUser(@RequestBody User user, @PathVariable String version) {
         //有推荐人手机号
         String directRecommendUserPhone = user.getDirectRecommendUser();
         if (StringUtils.isNotBlank(directRecommendUserPhone)) {
@@ -78,14 +86,14 @@ public class UserController {
 
                 user.setUserType(UserType.app);
 
-                User newUser = userService.save(user);
+                User newUser = userService.insertUser(user);
 
                 // 生成融云token
                 TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), user.getNickName(), user.getHeadImgUrl());
                 user.setRongCloudToken(tokenResult.getToken());
 
                 return new ControllerResult().setRet_code(0)
-                        .setRet_values(userService.save(newUser));
+                        .setRet_values(userService.insertUser(newUser));
             }
             return new ControllerResult().setRet_code(1).setRet_values("")
                     .setMessage("验证码错误");
@@ -101,8 +109,9 @@ public class UserController {
      * @param phone
      * @return
      */
-    @RequestMapping(value = "regSendSms/{phone}")
-    public ControllerResult regSendSms(@PathVariable String phone) {
+    @ApiOperation(value = "注册发送短信验证码")
+    @RequestMapping(value = "regSendSms/{phone}/{version}", method = RequestMethod.GET)
+    public ControllerResult regSendSms(@PathVariable String phone, @PathVariable String version) {
         if (StringUtils.isBlank(phone)) {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能为空");
         }
@@ -128,8 +137,9 @@ public class UserController {
      * @param phone
      * @return
      */
-    @RequestMapping(value = "loginSendSms/{phone}")
-    public ControllerResult loginSendSms(@PathVariable String phone) {
+    @ApiOperation(value = "登陆验证码")
+    @RequestMapping(value = "loginSendSms/{phone}/{version}", method = RequestMethod.GET)
+    public ControllerResult loginSendSms(@PathVariable String phone, @PathVariable String version) {
         if (StringUtils.isBlank(phone)) {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能为空");
         }
@@ -151,8 +161,9 @@ public class UserController {
      * @param phone
      * @return
      */
-    @RequestMapping(value = "updateSendSms/{phone}")
-    public ControllerResult updateSendSms(@PathVariable String phone) {
+    @ApiOperation(value = "修改密码验证码")
+    @RequestMapping(value = "updateSendSms/{phone}/{version}", method = RequestMethod.GET)
+    public ControllerResult updateSendSms(@PathVariable String phone, @PathVariable String version) {
         if (StringUtils.isBlank(phone)) {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能为空");
         }
@@ -178,8 +189,9 @@ public class UserController {
      * @param login
      * @return
      */
-    @RequestMapping(value = "login")
-    public ControllerResult login(@RequestBody User login) {
+    @ApiOperation(value = "登录")
+    @RequestMapping(value = "login/{version}", method = RequestMethod.POST)
+    public ControllerResult login(@RequestBody User login, @PathVariable String version) {
         String code = login.getCode();
         String phone = login.getPhone();
         String password = login.getPassword();
@@ -195,11 +207,11 @@ public class UserController {
             if (user == null) {
                 // 注册
                 login.setUserType(UserType.app);
-                User newUser = userService.save(login);
+                User newUser = userService.insertUser(login);
                 // 生成融云token
                 TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), user.getNickName(), user.getHeadImgUrl());
                 newUser.setRongCloudToken(tokenResult.getToken());
-                return new ControllerResult().setRet_code(0).setRet_values(userService.save(newUser)).setMessage("登陆成功");
+                return new ControllerResult().setRet_code(0).setRet_values(userService.insertUser(newUser)).setMessage("登陆成功");
             }
         } else {
             // 密码登陆
@@ -226,13 +238,14 @@ public class UserController {
      * @param thirdLogin
      * @return
      */
-    @RequestMapping("thirdLogin")
-    public ControllerResult thirdLogin(@RequestBody User thirdLogin) {
-        User user = userService.save(thirdLogin);
+    @ApiOperation(value = "第三方登录")
+    @RequestMapping(value = "thirdLogin/{version}", method = RequestMethod.POST)
+    public ControllerResult thirdLogin(@RequestBody User thirdLogin, @PathVariable String version) {
+        User user = userService.insertUser(thirdLogin);
         // 生成融云token
         TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
         user.setRongCloudToken(tokenResult.getToken());
-        user = userService.save(user);
+        user = userService.insertUser(user);
         return new ControllerResult().setRet_code(0).setRet_values(user).setMessage("登陆成功");
     }
 
@@ -242,8 +255,9 @@ public class UserController {
      * @param login
      * @return
      */
-    @RequestMapping(value = "updatePassword")
-    public ControllerResult updatePassword(@RequestBody User login) {
+    @ApiOperation(value = "修改密码")
+    @RequestMapping(value = "updatePassword/{version}", method = RequestMethod.POST)
+    public ControllerResult updatePassword(@RequestBody User login, @PathVariable String version) {
         String code = login.getCode();
         String phone = login.getPhone();
         String password = login.getPassword();
@@ -263,12 +277,30 @@ public class UserController {
     }
 
     /**
+     * 用户定位
+     *
+     * @param userLocation
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "用户定位")
+    @RequestMapping(value = "saveUserLocation/{version}", method = RequestMethod.POST)
+    public ControllerResult saveUserLocation(@RequestBody UserLocation userLocation, @PathVariable String version) {
+        boolean result = userinfoService.updateUserLocation(userLocation);
+        if (result) {
+            return new ControllerResult().setRet_code(0).setRet_values("").setMessage("定位成功");
+        }
+        return new ControllerResult().setRet_code(1).setRet_values("").setMessage("定位失败");
+    }
+
+    /**
      * @param login
      * @return
      * @throws ServletException
      */
-    @RequestMapping(value = "/jwtLogin", method = RequestMethod.POST)
-    public String jwtLogin(@RequestBody User login) throws ServletException {
+    @ApiIgnore
+    @RequestMapping(value = "/jwtLogin/{version}", method = RequestMethod.POST)
+    public String jwtLogin(@RequestBody User login, @PathVariable String version) throws ServletException {
 
         String jwtToken = "";
 

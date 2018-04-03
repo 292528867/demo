@@ -32,6 +32,6 @@ public class SecureController {
 
     @RequestMapping(value = "/user/update", method = RequestMethod.POST)
     public User updateUser(@RequestBody User user) {
-        return userService.save(user);
+        return userService.insertUser(user);
     }
 }
