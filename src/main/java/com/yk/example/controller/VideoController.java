@@ -1,18 +1,20 @@
 package com.yk.example.controller;
 
 import com.yk.example.dto.ControllerResult;
+import com.yk.example.entity.Music;
 import com.yk.example.entity.VideoRecord;
 import com.yk.example.entity.VideoTag;
+import com.yk.example.entity.VideoZan;
+import com.yk.example.manage.UserInfoController;
+import com.yk.example.service.MusicService;
 import com.yk.example.service.VideoService;
 import com.yk.example.service.VideoTagService;
+import com.yk.example.service.VideoZanService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +32,12 @@ public class VideoController {
     @Autowired
     private VideoTagService videoTagService;
 
+    @Autowired
+    private VideoZanService videoZanService;
+
+    @Autowired
+    private MusicService musicService;
+
     /**
      * 查询附近的用户最新的视频
      *
@@ -43,9 +51,23 @@ public class VideoController {
     @RequestMapping(value = "nearby/{version}", method = RequestMethod.GET)
     public ControllerResult nearby(@ApiParam(name = "longitude", value = "经度", required = true) double longitude,
                                    @ApiParam(name = "latitude", value = "纬度", required = true) double latitude,
-                                   int page, int size, @PathVariable String version) {
-        List<VideoRecord> videoRecords = videoService.nearby(longitude, latitude, page, size);
-        return new ControllerResult().setRet_values(videoRecords).setMessage("");
+                                   @PathVariable String version) {
+        List<VideoRecord> videoRecords = videoService.nearby(longitude, latitude, 0, 0);
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+    }
+
+    /**
+     * 推荐的视频
+     *
+     * @param userId
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "推荐的视频")
+    @RequestMapping(value = "recommend/{version}", method = RequestMethod.GET)
+    public ControllerResult recommend(String userId, @PathVariable String version) {
+        List<VideoRecord> videoRecords = videoService.recommend(userId);
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
     }
 
     /**
@@ -57,8 +79,50 @@ public class VideoController {
     @RequestMapping(value = "allTag/{version}", method = RequestMethod.GET)
     public ControllerResult allTag(@PathVariable String version) {
         List<VideoTag> list = videoTagService.findAll(null);
-        return new ControllerResult().setRet_values(list).setMessage("");
+        return new ControllerResult().setRet_code(0).setRet_values(list).setMessage("");
     }
 
+    /**
+     * 视频详情
+     *
+     * @param videoId
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "视频详情")
+    @RequestMapping(value = "videoDetail/{videoId}/{version}")
+    public ControllerResult videoDetail(@PathVariable String videoId, @PathVariable String version, String userId) {
+        VideoRecord videoRecord = videoService.findOne(videoId, userId);
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecord).setMessage("");
+    }
 
+    /**
+     * 视频点赞
+     *
+     * @param videoZan
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "视频点赞")
+    @RequestMapping(value = "videoZan/{version}")
+    public ControllerResult videoZan(@RequestBody VideoZan videoZan, @PathVariable String version) {
+        if (StringUtils.isNotBlank(videoZan.getUser().getUserId())) {
+            videoZanService.save(videoZan);
+            return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+        }
+        return new ControllerResult().setRet_code(99).setRet_values("").setMessage("请先登录");
+    }
+
+    /**
+     * 音乐列表
+     *
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "音乐列表")
+    @RequestMapping(value = "allMusic/{version}", method = RequestMethod.GET)
+    public ControllerResult allMusic(@PathVariable String version) {
+        List<Music> musics = musicService.findAll();
+        return new ControllerResult().setRet_code(0).setRet_values(musics).setMessage("");
+    }
 }

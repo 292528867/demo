@@ -18,6 +18,18 @@ public class UserFollow extends BaseEntity {
     @Column(name = "follow_id", columnDefinition = " varchar(50) comment '被关注用户id'")
     private String followId;
 
+    @Column(name = "status", columnDefinition = " varchar(50) comment '关注1,取消 0'")
+    private boolean status;
+
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
     public String getUserId() {
         return userId;
     }

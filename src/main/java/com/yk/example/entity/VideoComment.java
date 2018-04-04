@@ -1,5 +1,7 @@
 package com.yk.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 /**
@@ -8,18 +10,31 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "t_video_comment")
+@JsonIgnoreProperties({"videoRecord"})
 public class VideoComment extends BaseEntity {
 
     @Column(name = "content",columnDefinition = " varchar(255) comment '评论内容'")
     private String content;
 
-    @Column(name = "zan_num",columnDefinition = " int comment '评论内容'")
+    @Column(name = "zan_num",columnDefinition = " int comment '点赞数目'")
     private int zanNum;
 
-    @ManyToOne(cascade = { CascadeType.ALL })
+    @ManyToOne()
     @JoinColumn(name="user_id")
     private User user;
 
+    @ManyToOne()
+    @JoinColumn(name = "video_id")
+    private VideoRecord videoRecord;
+
+
+    public VideoRecord getVideoRecord() {
+        return videoRecord;
+    }
+
+    public void setVideoRecord(VideoRecord videoRecord) {
+        this.videoRecord = videoRecord;
+    }
 
     public String getContent() {
         return content;

@@ -4,16 +4,18 @@ import com.yk.example.dao.UserDao;
 import com.yk.example.dao.UserInfoDao;
 import com.yk.example.dao.UserLocationHistoryDao;
 import com.yk.example.dto.UserLocation;
+import com.yk.example.entity.UserInfo;
 import com.yk.example.entity.UserLocationHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
- * Created by yk on 2018/4/3.
+ * Created by yk on 2018/4/4.
  */
 @Service
-public class UserinfoService {
+public class UserInfoService {
 
     @Autowired
     private UserInfoDao userInfoDao;
@@ -34,7 +36,11 @@ public class UserinfoService {
         history.setLongitude(longitude);
         history.setUser(userDao.findOne(userId));
         userLocationHistoryDao.save(history);
-        userInfoDao.updateUserLocation(longitude,latitude,userId);
+        userInfoDao.updateUserLocation(longitude, latitude, userId);
         return true;
+    }
+
+    public UserInfo editUserInfo(UserInfo userInfo) {
+        return userInfoDao.save(userInfo);
     }
 }

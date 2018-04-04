@@ -21,10 +21,10 @@ public class UserInfo {
     private String id;
 
     @Column(name = "last_longitude", columnDefinition = " numeric(10,5) comment '最后的经度' ")
-    private String lastLongitude;
+    private double lastLongitude;
 
     @Column(name = "last_latitude", columnDefinition = " numeric(10,5) comment '最后的纬度' ")
-    private String lastLatitude;
+    private double lastLatitude;
 
     @Column(name = "fan_num", columnDefinition = " bigint  comment '粉丝数量' ")
     private long fanNum;
@@ -65,19 +65,19 @@ public class UserInfo {
         this.id = id;
     }
 
-    public String getLastLongitude() {
+    public double getLastLongitude() {
         return lastLongitude;
     }
 
-    public void setLastLongitude(String lastLongitude) {
+    public void setLastLongitude(double lastLongitude) {
         this.lastLongitude = lastLongitude;
     }
 
-    public String getLastLatitude() {
+    public double getLastLatitude() {
         return lastLatitude;
     }
 
-    public void setLastLatitude(String lastLatitude) {
+    public void setLastLatitude(double lastLatitude) {
         this.lastLatitude = lastLatitude;
     }
 

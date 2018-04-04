@@ -1,13 +1,16 @@
 package com.yk.example.service;
 
-import com.yk.example.dao.UserInfoDao;
-import com.yk.example.dao.VideoDao;
+import com.yk.example.dao.*;
+import com.yk.example.entity.UserFollow;
 import com.yk.example.entity.UserInfo;
 import com.yk.example.entity.VideoRecord;
+import com.yk.example.entity.VideoZan;
+import com.yk.example.enums.ZanStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +24,15 @@ public class VideoService {
 
     @Autowired
     private UserInfoDao userInfoDao;
+
+    @Autowired
+    private VideoCommentDao videoCommentDao;
+
+    @Autowired
+    private VideoZanDao videoZanDao;
+
+    @Autowired
+    private UserFollowDao userFollowDao;
 
     public List<VideoRecord> nearby(double longitude, double latitude, int page, int size) {
         //先计算查询点的经纬度范围
@@ -39,14 +51,57 @@ public class VideoService {
         double maxlng = longitude + dlng;
         // 查询附近 30 km的用户
         List<UserInfo> userInfos = userInfoDao.findNearbyUser(minlng, maxlng, minlat, maxlat);
-        List<VideoRecord> videoRecords = null;
+        List<VideoRecord> videoRecords = new ArrayList<>();
         if (userInfos != null && userInfos.size() > 0) {
             for (UserInfo userInfo : userInfos) {
                 // 查询用户的最后一个视频
-              VideoRecord videoRecord =   videoDao.findLastVideoByUser(userInfo.getUser().getUserId());
+                VideoRecord videoRecord = videoDao.findLastVideoByUser(userInfo.getUser().getUserId());
                 videoRecords.add(videoRecord);
             }
         }
         return videoRecords;
+    }
+
+
+    public List<VideoRecord> recommend(String userId) {
+        List<VideoRecord> videoRecords = new ArrayList<>();
+        // 登录了 按偏好推荐
+        if (StringUtils.isNotBlank(userId)) {
+
+        } else {
+            Iterable<VideoRecord> all = videoDao.findAll();
+            all.forEach(videoRecord -> {
+                videoRecords.add(videoRecord);
+            });
+        }
+        return videoRecords;
+    }
+
+    public VideoRecord findOne(String videoId, String userId) {
+        VideoRecord videoRecord = videoDao.findOne(videoId);
+        if(StringUtils.isNotBlank(userId)){
+             // 判断是否点赞
+            VideoZan videoZan = videoZanDao.isZan(videoId, userId);
+            if(videoZan == null){
+                 videoRecord.setZan(false);
+            }else {
+                 if(videoZan.getZanStatus().equals(ZanStatus.zan)){
+                     videoRecord.setZan(true);
+                 }else {
+                     videoRecord.setZan(false);
+                 }
+            }
+            // 判断 是否关注
+          UserFollow userFollow = userFollowDao.existsFollow(userId, videoRecord.getUser().getUserId());
+           if(userFollow == null){
+               videoRecord.setFollow(false);
+           }else {
+               videoRecord.setFollow(true);
+           }
+        }else {
+            videoRecord.setZan(false);
+            videoRecord.setFollow(false);
+        }
+        return videoRecord;
     }
 }

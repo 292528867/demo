@@ -4,10 +4,13 @@ import com.yk.example.dao.UserDao;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.dto.UserLocation;
 import com.yk.example.entity.User;
+import com.yk.example.entity.UserFollow;
+import com.yk.example.entity.UserInfo;
 import com.yk.example.enums.UserType;
 import com.yk.example.rongCloud.models.response.TokenResult;
+import com.yk.example.service.UserFollowService;
+import com.yk.example.service.UserInfoService;
 import com.yk.example.service.UserService;
-import com.yk.example.service.UserinfoService;
 import com.yk.example.utils.Md5Utlls;
 import com.yk.example.utils.RongCloudUtils;
 import com.yk.example.utils.SmsUtils;
@@ -47,7 +50,10 @@ public class UserController {
     private StringRedisTemplate redisTemplate;
 
     @Autowired
-    private UserinfoService userinfoService;
+    private UserInfoService userInfoService;
+
+    @Autowired
+    private UserFollowService userFollowService;
 
     /**
      * app 用户注册
@@ -286,11 +292,38 @@ public class UserController {
     @ApiOperation(value = "用户定位")
     @RequestMapping(value = "saveUserLocation/{version}", method = RequestMethod.POST)
     public ControllerResult saveUserLocation(@RequestBody UserLocation userLocation, @PathVariable String version) {
-        boolean result = userinfoService.updateUserLocation(userLocation);
+        boolean result = userInfoService.updateUserLocation(userLocation);
         if (result) {
             return new ControllerResult().setRet_code(0).setRet_values("").setMessage("定位成功");
         }
         return new ControllerResult().setRet_code(1).setRet_values("").setMessage("定位失败");
+    }
+
+    /**
+     * 用户资料编辑
+     *
+     * @param userInfo
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "用户资料编辑")
+    @RequestMapping(value = "editUserInfo/{version}", method = RequestMethod.POST)
+    public ControllerResult editUserInfo(@RequestBody UserInfo userInfo, @PathVariable String version) {
+        UserInfo info = userInfoService.editUserInfo(userInfo);
+        return new ControllerResult().setRet_code(0).setRet_values(info).setMessage("修改成功");
+    }
+
+    /**
+     *  关注用户
+     * @param userFollow
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "关注用户")
+    @RequestMapping(value = "followUser/{version}", method = RequestMethod.POST)
+    public ControllerResult followUser(@RequestBody UserFollow userFollow ,@PathVariable String version){
+       UserFollow  userFollow1 =  userFollowService.save(userFollow);
+        return new ControllerResult().setRet_code(0).setRet_values(userFollow1).setMessage("");
     }
 
     /**
