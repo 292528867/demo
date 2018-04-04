@@ -45,6 +45,7 @@ public class VideoCommentController {
      * @param version
      * @return
      */
+    @ApiOperation(value = "查询视频的评论列表")
     @RequestMapping(value = "findComment/{videoId}/{version}", method = RequestMethod.GET)
     public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version) {
         List<VideoComment> videoComments = videoCommentService.findAllByVideoId(videoId);

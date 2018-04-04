@@ -1,5 +1,6 @@
 package com.yk.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yk.example.enums.ZanStatus;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "t_video_zan")
+@JsonIgnoreProperties({"videoRecord"})
 public class VideoZan extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

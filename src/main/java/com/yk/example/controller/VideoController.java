@@ -90,7 +90,7 @@ public class VideoController {
      * @return
      */
     @ApiOperation(value = "视频详情")
-    @RequestMapping(value = "videoDetail/{videoId}/{version}")
+    @RequestMapping(value = "videoDetail/{videoId}/{version}",method = RequestMethod.GET)
     public ControllerResult videoDetail(@PathVariable String videoId, @PathVariable String version, String userId) {
         VideoRecord videoRecord = videoService.findOne(videoId, userId);
         return new ControllerResult().setRet_code(0).setRet_values(videoRecord).setMessage("");
@@ -104,7 +104,7 @@ public class VideoController {
      * @return
      */
     @ApiOperation(value = "视频点赞")
-    @RequestMapping(value = "videoZan/{version}")
+    @RequestMapping(value = "videoZan/{version}",method = RequestMethod.POST)
     public ControllerResult videoZan(@RequestBody VideoZan videoZan, @PathVariable String version) {
         if (StringUtils.isNotBlank(videoZan.getUser().getUserId())) {
             videoZanService.save(videoZan);
