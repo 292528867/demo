@@ -85,8 +85,13 @@ public class UserController {
         String code = user.getCode();
         if (StringUtils.isNoneBlank(redisCode)) {
             if (redisCode.equals(code)) {
+
                 // 密码进行md5加密
                 String password = user.getPassword();
+                if(StringUtils.isBlank(password)){
+                    return new ControllerResult().setRet_code(1).setRet_values("")
+                            .setMessage("密码不能为空");
+                }
                 String newPassword = Md5Utlls.getMD5String(password);
                 user.setPassword(newPassword);
 

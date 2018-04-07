@@ -18,7 +18,6 @@ import java.util.Date;
  */
 @ApiModel(value = "user登录对象", description = "用户登录对象user")
 @Entity
-@JsonIgnoreProperties({"password"})
 @Table(name = "t_user")
 
 public class User implements Serializable {
