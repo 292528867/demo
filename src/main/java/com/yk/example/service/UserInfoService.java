@@ -28,8 +28,8 @@ public class UserInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean updateUserLocation(UserLocation userLocation) {
-        String longitude = userLocation.getLongitude();
-        String latitude = userLocation.getLatitude();
+        double longitude = userLocation.getLongitude();
+        double latitude = userLocation.getLatitude();
         String userId = userLocation.getUserId();
         UserLocationHistory history = new UserLocationHistory();
         history.setLatitude(latitude);

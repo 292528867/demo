@@ -10,7 +10,6 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "t_video_comment")
-@JsonIgnoreProperties({"videoRecord"})
 public class VideoComment extends BaseEntity {
 
     @Column(name = "content",columnDefinition = " varchar(255) comment '评论内容'")

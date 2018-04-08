@@ -1,5 +1,6 @@
 package com.yk.example.entity;
 
+import com.yk.example.enums.ViewAuth;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -24,6 +25,9 @@ public class VideoRecord extends BaseEntity {
     @Column(name = "latitude", columnDefinition = " numeric(10,5) comment '纬度' ")
     private String latitude;
 
+    @Column(name = "address", columnDefinition = " varchar(255) comment '发布地址' ")
+    private String address;
+
     @ApiModelProperty(value = "视频url", name = "videoUrl")
     @Column(name = "video_url", columnDefinition = " varchar(255) comment '视频url' ")
     private String videoUrl;
@@ -43,11 +47,11 @@ public class VideoRecord extends BaseEntity {
     private int commentNum;
 
 
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne()
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne()
     @JoinColumn(name = "tag_id")
     private VideoTag tag;
 
@@ -55,14 +59,22 @@ public class VideoRecord extends BaseEntity {
     @Column(name = "status", columnDefinition = " varchar(2) comment '0 草稿 1 发布' ")
     private String status;
 
+    @ApiModelProperty(value = "查看权限 0 所有人可查看 1 好友查看 2 仅自己查看", name = "viewAuth")
+    @Column(name = "viewAuth", columnDefinition = " varchar(2) comment '查看权限 0 所有人可查看 1 好友查看 2 仅自己查看' ")
+    private ViewAuth viewAuth;
+
 
     // 用户是否关注
+    @ApiModelProperty(value = "用户是否关注", name = "status")
     @Transient
     private boolean isFollow;
 
     // 用户是否点赞
+    @ApiModelProperty(value = "用户是否点赞", name = "status")
     @Transient
     private boolean isZan;
+
+
 
 
     public boolean isFollow() {
@@ -167,5 +179,21 @@ public class VideoRecord extends BaseEntity {
 
     public void setTag(VideoTag tag) {
         this.tag = tag;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public ViewAuth getViewAuth() {
+        return viewAuth;
+    }
+
+    public void setViewAuth(ViewAuth viewAuth) {
+        this.viewAuth = viewAuth;
     }
 }

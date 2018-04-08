@@ -11,10 +11,10 @@ import javax.persistence.*;
 public class UserLocationHistory extends BaseEntity {
 
     @Column(name = "longitude", columnDefinition = " numeric(10,5) comment '经度' ")
-    private String longitude;
+    private double longitude;
 
     @Column(name = "latitude", columnDefinition = " numeric(10,5) comment '纬度' ")
-    private String latitude;
+    private double latitude;
 
     @Column(name = "address", columnDefinition = " varchar(255) comment '地址' ")
     private String address;
@@ -23,19 +23,19 @@ public class UserLocationHistory extends BaseEntity {
     @JoinColumn(name = "user_id", columnDefinition = " varchar(50) comment '用户id ' ")
     private User user;
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 

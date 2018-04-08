@@ -1,6 +1,7 @@
 package com.yk.example.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.yk.example.enums.PlatForm;
 import com.yk.example.enums.Sex;
 import com.yk.example.enums.UserType;
 import io.swagger.annotations.ApiModel;
@@ -70,6 +71,12 @@ public class User implements Serializable {
 
     @Column(name = "space_recommend_user", columnDefinition = "varchar(100) COMMENT '推荐人的推荐人' ")
     private String spaceRecommendUser;
+
+    @Column(name = "device_token", columnDefinition = "varchar(100) COMMENT '设备标识符' ")
+    private String deviceToken;
+
+    @Column(name = "platform", columnDefinition = "varchar(100) COMMENT '账号手机平台 0 安卓 1 ios 2 其他' ")
+    private PlatForm platform;
 
     @CreationTimestamp
     private Date createTime;
@@ -203,5 +210,21 @@ public class User implements Serializable {
 
     public void setSpaceRecommendUser(String spaceRecommendUser) {
         this.spaceRecommendUser = spaceRecommendUser;
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
+    public PlatForm getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(PlatForm platform) {
+        this.platform = platform;
     }
 }

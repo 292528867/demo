@@ -2,7 +2,9 @@ package com.yk.example.controller;
 
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.entity.VideoComment;
+import com.yk.example.entity.VideoCommentZan;
 import com.yk.example.service.VideoCommentService;
+import com.yk.example.service.VideoCommentZanService;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,10 @@ public class VideoCommentController {
     private VideoCommentService videoCommentService;
 
 
+    @Autowired
+    private VideoCommentZanService videoCommentZanService;
+
+
     /**
      * 提交视频评论
      *
@@ -32,7 +38,7 @@ public class VideoCommentController {
     @RequestMapping(value = "submit/{version}", method = RequestMethod.POST)
     public ControllerResult submit(@RequestBody VideoComment videoComment, @PathVariable String version) {
         if (StringUtils.isNotBlank(videoComment.getUser().getUserId())) {
-             videoCommentService.save(videoComment);
+            videoCommentService.save(videoComment);
             return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
         }
         return new ControllerResult().setRet_code(99).setRet_values("").setMessage("用户未登录,请登录");
@@ -50,5 +56,22 @@ public class VideoCommentController {
     public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version) {
         List<VideoComment> videoComments = videoCommentService.findAllByVideoId(videoId);
         return new ControllerResult().setRet_code(0).setRet_values(videoComments).setMessage("");
+    }
+
+    /**
+     * 对评论进行点赞或者取消点赞
+     *
+     * @param videoCommentZan
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "对评论进行点赞或者取消点赞")
+    @RequestMapping(value = "commentZan/{version}",method = RequestMethod.POST)
+    public ControllerResult commentZan(@RequestBody VideoCommentZan videoCommentZan, @PathVariable String version) {
+        if (StringUtils.isNotBlank(videoCommentZan.getUser().getUserId())) {
+            videoCommentZanService.zan(videoCommentZan);
+            return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+        }
+        return new ControllerResult().setRet_code(99).setRet_values("").setMessage("请先登录");
     }
 }

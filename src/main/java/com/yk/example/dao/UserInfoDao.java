@@ -18,5 +18,5 @@ public interface UserInfoDao extends CrudRepository<UserInfo, String>, JpaSpecif
 
     @Modifying
     @Query("update UserInfo u set u.lastLongitude = ?1 ,u.lastLatitude = ?2 where u.user.userId = ?3 ")
-    int updateUserLocation(String longitude, String latitude, String userId);
+    int updateUserLocation(double longitude, double latitude, String userId);
 }

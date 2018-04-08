@@ -5,16 +5,17 @@ import com.yk.example.enums.ZanStatus;
 import javax.persistence.*;
 
 /**
- *  视频点赞表
- * Created by yk on 2018/4/4.
+ * 评论点赞实体
+ * Created by yk on 2018/4/8.
  */
 @Entity
-@Table(name = "t_video_zan")
-public class VideoZan extends BaseEntity {
+@Table(name = "t_video_comment_zan")
+public class VideoCommentZan extends BaseEntity {
+
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "video_id")
-    private VideoRecord videoRecord;
+    @JoinColumn(name = "comment_id")
+    private VideoComment comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -23,12 +24,13 @@ public class VideoZan extends BaseEntity {
     @Column(name = "zanStatus" , columnDefinition = " varchar(2) comment '点赞状态 0 点赞 1 取消点赞' ")
     private ZanStatus zanStatus;
 
-    public VideoRecord getVideoRecord() {
-        return videoRecord;
+
+    public VideoComment getComment() {
+        return comment;
     }
 
-    public void setVideoRecord(VideoRecord videoRecord) {
-        this.videoRecord = videoRecord;
+    public void setComment(VideoComment comment) {
+        this.comment = comment;
     }
 
     public User getUser() {

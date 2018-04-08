@@ -30,7 +30,9 @@ public class VideoTagService {
             @Override
             public Predicate toPredicate(Root<VideoTag> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> predicates = new ArrayList<>(); //所有的断言
-
+                if (StringUtils.isNotBlank(videoTag.getName())) {
+                    predicates.add(criteriaBuilder.like(root.get("name").as(String.class), videoTag.getName() + "%"));
+                }
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };

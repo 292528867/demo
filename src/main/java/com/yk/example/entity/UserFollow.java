@@ -12,11 +12,14 @@ import javax.persistence.Table;
 @Table(name = "t_user_follow")
 public class UserFollow extends BaseEntity {
 
-    @Column(name = "user_id", columnDefinition = " varchar(50) comment '关注用户id'")
+    @Column(name = "user_id", columnDefinition = " varchar(50) comment '粉丝用户id'")
     private String userId;
 
     @Column(name = "follow_id", columnDefinition = " varchar(50) comment '被关注用户id'")
     private String followId;
+
+    @Column(name = "head_img_url", columnDefinition = " varchar(255) comment '被关注用户图像url'")
+    private String headImgUrl;
 
     @Column(name = "status", columnDefinition = " varchar(50) comment '关注1,取消 0'")
     private boolean status;
@@ -44,5 +47,13 @@ public class UserFollow extends BaseEntity {
 
     public void setFollowId(String followId) {
         this.followId = followId;
+    }
+
+    public String getHeadImgUrl() {
+        return headImgUrl;
+    }
+
+    public void setHeadImgUrl(String headImgUrl) {
+        this.headImgUrl = headImgUrl;
     }
 }

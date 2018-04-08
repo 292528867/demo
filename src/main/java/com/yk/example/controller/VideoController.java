@@ -1,15 +1,9 @@
 package com.yk.example.controller;
 
 import com.yk.example.dto.ControllerResult;
-import com.yk.example.entity.Music;
-import com.yk.example.entity.VideoRecord;
-import com.yk.example.entity.VideoTag;
-import com.yk.example.entity.VideoZan;
+import com.yk.example.entity.*;
 import com.yk.example.manage.UserInfoController;
-import com.yk.example.service.MusicService;
-import com.yk.example.service.VideoService;
-import com.yk.example.service.VideoTagService;
-import com.yk.example.service.VideoZanService;
+import com.yk.example.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +31,9 @@ public class VideoController {
 
     @Autowired
     private MusicService musicService;
+
+    @Autowired
+    private VideoCollectService videoCollectService;
 
     /**
      * 查询附近的用户最新的视频
@@ -71,14 +68,14 @@ public class VideoController {
     }
 
     /**
-     * 查询所有的视频标签
+     * 查询标签
      *
      * @return
      */
-    @ApiOperation(value = "视频标签列表")
-    @RequestMapping(value = "allTag/{version}", method = RequestMethod.GET)
-    public ControllerResult allTag(@PathVariable String version) {
-        List<VideoTag> list = videoTagService.findAll(null);
+    @ApiOperation(value = "查询标签")
+    @RequestMapping(value = "queryTag/{version}", method = RequestMethod.GET)
+    public ControllerResult allTag(@PathVariable String version, VideoTag videoTag) {
+        List<VideoTag> list = videoTagService.findAll(videoTag);
         return new ControllerResult().setRet_code(0).setRet_values(list).setMessage("");
     }
 
@@ -90,7 +87,7 @@ public class VideoController {
      * @return
      */
     @ApiOperation(value = "视频详情")
-    @RequestMapping(value = "videoDetail/{videoId}/{version}",method = RequestMethod.GET)
+    @RequestMapping(value = "videoDetail/{videoId}/{version}", method = RequestMethod.GET)
     public ControllerResult videoDetail(@PathVariable String videoId, @PathVariable String version, String userId) {
         VideoRecord videoRecord = videoService.findOne(videoId, userId);
         return new ControllerResult().setRet_code(0).setRet_values(videoRecord).setMessage("");
@@ -104,7 +101,7 @@ public class VideoController {
      * @return
      */
     @ApiOperation(value = "视频点赞")
-    @RequestMapping(value = "videoZan/{version}",method = RequestMethod.POST)
+    @RequestMapping(value = "videoZan/{version}", method = RequestMethod.POST)
     public ControllerResult videoZan(@RequestBody VideoZan videoZan, @PathVariable String version) {
         if (StringUtils.isNotBlank(videoZan.getUser().getUserId())) {
             videoZanService.save(videoZan);
@@ -124,5 +121,23 @@ public class VideoController {
     public ControllerResult allMusic(@PathVariable String version) {
         List<Music> musics = musicService.findAll();
         return new ControllerResult().setRet_code(0).setRet_values(musics).setMessage("");
+    }
+
+    /**
+     * 秒转
+     *
+     * @param VideoCollect
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "秒转")
+    @RequestMapping(value = "collectVideo/{version}", method = RequestMethod.POST)
+    public ControllerResult collectVideo(@RequestBody VideoCollect VideoCollect, @PathVariable String version) {
+        VideoCollect collect = videoCollectService.existCollect(VideoCollect.getVideoRecord().getId(), VideoCollect.getUser().getUserId());
+        if (collect != null) {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("已经秒转过");
+        }
+        videoCollectService.save(VideoCollect);
+        return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
     }
 }
