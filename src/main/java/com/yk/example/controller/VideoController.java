@@ -37,6 +37,10 @@ public class VideoController {
     @Autowired
     private VideoCollectService videoCollectService;
 
+    @Autowired
+    private UserFollowService userFollowService;
+
+
     /**
      * 查询附近的用户最新的视频
      *
@@ -144,7 +148,8 @@ public class VideoController {
     }
 
     /**
-     *  获取短视频上传凭证
+     * 获取短视频上传凭证
+     *
      * @param version
      * @param fileName
      * @param userId
@@ -152,22 +157,63 @@ public class VideoController {
      * @return
      */
     @ApiOperation(value = "获取短视频上传凭证")
-    @RequestMapping(value = "createUploadVideo/{version}",method = RequestMethod.GET)
-    public ControllerResult createUploadVideo (@PathVariable String version ,String fileName,String userId,String title){
+    @RequestMapping(value = "createUploadVideo/{version}", method = RequestMethod.GET)
+    public ControllerResult createUploadVideo(@PathVariable String version, String fileName, String userId, String title) {
         VodAuth vodAuth = VodUtils.createUploadVideo(userId + "_" + System.currentTimeMillis() + "_" + fileName, title);
         return new ControllerResult().setRet_code(0).setRet_values(vodAuth).setMessage("");
     }
 
     /**
-     *  刷新短视频上传凭证
+     * 刷新短视频上传凭证
+     *
      * @param version
      * @param aliVideoId
      * @return
      */
     @ApiOperation(value = "刷新短视频上传凭证")
-    @RequestMapping(value = "refreshUploadVideo/{version}",method = RequestMethod.GET)
-    public  ControllerResult refreshUploadVideo(@PathVariable String version ,String aliVideoId ){
+    @RequestMapping(value = "refreshUploadVideo/{version}", method = RequestMethod.GET)
+    public ControllerResult refreshUploadVideo(@PathVariable String version, String aliVideoId) {
         VodUtils.refreshUploadVideo(aliVideoId);
         return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+    }
+
+    /**
+     * 关注用户列表
+     *
+     * @param version
+     * @param userId
+     * @return
+     */
+    @ApiOperation(value = "关注列表")
+    @RequestMapping(value = "allFollow/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult allFollow(@PathVariable String version, @PathVariable String userId) {
+        List<VideoRecord> videoRecords = userFollowService.findByUserId(userId);
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+    }
+
+    /**
+     *  我喜欢的视频
+     * @param version
+     * @param userId
+     * @return
+     */
+    @ApiOperation(value = "我喜欢的视频")
+    @RequestMapping(value = "myLike/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult myLike(@PathVariable String version, @PathVariable String userId){
+        List<VideoRecord> videoRecords = videoCollectService.findByUserId(userId);
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+    }
+
+    /**
+     *  我的作品
+     * @param version
+     * @param userId
+     * @return
+     */
+    @ApiOperation(value = "我的作品")
+    @RequestMapping(value = "myVideo/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult myVideo (@PathVariable String version, @PathVariable String userId){
+        List<VideoRecord> videoRecords = videoService.findByUser(userId);
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
     }
 }

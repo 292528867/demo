@@ -21,6 +21,9 @@ public class UserFollow extends BaseEntity {
     @Column(name = "head_img_url", columnDefinition = " varchar(255) comment '被关注用户图像url'")
     private String headImgUrl;
 
+    @Column(name = "nick_name", columnDefinition = " varchar(50) comment '被关注用户昵称'")
+    private String nickName;
+
     @Column(name = "status", columnDefinition = " varchar(50) comment '关注1,取消 0'")
     private boolean status;
 
@@ -55,5 +58,13 @@ public class UserFollow extends BaseEntity {
 
     public void setHeadImgUrl(String headImgUrl) {
         this.headImgUrl = headImgUrl;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

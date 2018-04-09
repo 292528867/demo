@@ -5,10 +5,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 /**
  * Created by yk on 2018/4/8.
  */
 public interface VideoCollectDao extends CrudRepository<VideoCollect, String>, JpaSpecificationExecutor {
     @Query(" from VideoCollect vc where vc.videoRecord.id = ?1 and vc.user.userId = ?2 ")
     VideoCollect existCollect(String id, String userId);
+
+    @Query(" from VideoCollect vc where  vc.user.userId = ?1 ")
+    List<VideoCollect> findByUser(String userId);
 }

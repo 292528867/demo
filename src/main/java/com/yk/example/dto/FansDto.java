@@ -9,33 +9,39 @@ import java.util.Date;
 /**
  * Created by yk on 2018/4/8.
  */
-@ApiModel(value="粉丝对象",description="粉丝对象")
-public class FansDto implements Serializable{
+@ApiModel(value = "粉丝对象", description = "粉丝对象")
+public class FansDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * 被关注用户图像
      */
-    @ApiModelProperty(value="被关注用户图像",name="headImgUrl")
+    @ApiModelProperty(value = "被关注用户图像", name = "headImgUrl")
     private String headImgUrl;
+
+    /**
+     * 被关注用户图像
+     */
+    @ApiModelProperty(value = "用户昵称", name = "nickName")
+    private String nickName;
 
     /**
      * 粉丝用户id
      */
-    @ApiModelProperty(value="粉丝用户id",name="followId")
+    @ApiModelProperty(value = "粉丝用户id", name = "followId")
     private String followId;
 
     /**
-     *  关注时间
+     * 关注时间
      */
-    @ApiModelProperty(value="经度",name="longitude")
+    @ApiModelProperty(value = "经度", name = "longitude")
     private Date createTime;
 
     /**
      * 是否关注
      */
-    @ApiModelProperty(value="是否关注",name="isFollow")
+    @ApiModelProperty(value = "是否关注", name = "isFollow")
     private boolean isFollow;
 
 
@@ -69,5 +75,13 @@ public class FansDto implements Serializable{
 
     public void setFollow(boolean follow) {
         isFollow = follow;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

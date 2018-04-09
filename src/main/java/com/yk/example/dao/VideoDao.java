@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 /**
  * Created by yk on 2018/4/2.
  */
@@ -22,4 +24,7 @@ public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecif
     @Modifying
     @Query(" update VideoRecord  vr set vr.zanNum = ?1 where vr.id = ?2 ")
     void updateZanNum(int zanNum, String videoId);
+
+    @Query(" from VideoRecord vr where vr.user.id = ?1")
+    List<VideoRecord> findByUserId(String userId);
 }

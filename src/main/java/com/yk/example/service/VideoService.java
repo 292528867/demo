@@ -104,4 +104,9 @@ public class VideoService {
         }
         return videoRecord;
     }
+
+    public List<VideoRecord> findByUser(String userId) {
+        List<VideoRecord> videoRecords = videoDao.findByUserId(userId);
+        return videoRecords;
+    }
 }
