@@ -1,6 +1,7 @@
 package com.yk.example.dao;
 
 import com.yk.example.entity.User;
+import com.yk.example.enums.PlatForm;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,8 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
     @Modifying
     @Query(" update User u set u.password = ?1 where u.phone = ?2 ")
     int updatePassword(String password, String phone);
+
+    @Modifying
+    @Query(" update User u set u.deviceToken = ?2 ,u.platform = ?3 where u.userId = ?1")
+    void updateDeviceToken(String userId, String deviceToken, PlatForm platform);
 }

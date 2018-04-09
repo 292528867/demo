@@ -1,9 +1,11 @@
 package com.yk.example.controller;
 
 import com.yk.example.dto.ControllerResult;
+import com.yk.example.dto.VodAuth;
 import com.yk.example.entity.*;
 import com.yk.example.manage.UserInfoController;
 import com.yk.example.service.*;
+import com.yk.example.utils.VodUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
@@ -138,6 +140,34 @@ public class VideoController {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("已经秒转过");
         }
         videoCollectService.save(VideoCollect);
+        return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+    }
+
+    /**
+     *  获取短视频上传凭证
+     * @param version
+     * @param fileName
+     * @param userId
+     * @param title
+     * @return
+     */
+    @ApiOperation(value = "获取短视频上传凭证")
+    @RequestMapping(value = "createUploadVideo/{version}",method = RequestMethod.GET)
+    public ControllerResult createUploadVideo (@PathVariable String version ,String fileName,String userId,String title){
+        VodAuth vodAuth = VodUtils.createUploadVideo(userId + "_" + System.currentTimeMillis() + "_" + fileName, title);
+        return new ControllerResult().setRet_code(0).setRet_values(vodAuth).setMessage("");
+    }
+
+    /**
+     *  刷新短视频上传凭证
+     * @param version
+     * @param aliVideoId
+     * @return
+     */
+    @ApiOperation(value = "刷新短视频上传凭证")
+    @RequestMapping(value = "refreshUploadVideo/{version}",method = RequestMethod.GET)
+    public  ControllerResult refreshUploadVideo(@PathVariable String version ,String aliVideoId ){
+        VodUtils.refreshUploadVideo(aliVideoId);
         return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
     }
 }

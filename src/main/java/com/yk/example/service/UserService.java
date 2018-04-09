@@ -51,7 +51,8 @@ public class UserService {
         Specification<User> specification = new Specification<User>() {
             @Override
             public Predicate toPredicate(Root<User> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-                List<Predicate> predicates = new ArrayList<>(); //所有的断言
+                //所有的断言
+                List<Predicate> predicates = new ArrayList<>();
                 if (StringUtils.isNoneBlank(user.getPhone())) {
                     predicates.add(criteriaBuilder.like(root.get("phone").as(String.class), user.getPhone() + "%"));
                 }
@@ -81,8 +82,13 @@ public class UserService {
         return userDao.findByPhone(phone);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updatePassword(String password, String phone) {
         return userDao.updatePassword(password, phone);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDeviceToken(User user) {
+        userDao.updateDeviceToken(user.getUserId(), user.getDeviceToken(), user.getPlatform());
     }
 }

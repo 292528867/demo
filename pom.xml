@@ -10,6 +10,8 @@
     <name>demo</name>
     <description>Demo project for Spring Boot</description>
 
+
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -24,6 +26,7 @@
         <thymeleaf.version>3.0.2.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.1.1</thymeleaf-layout-dialect.version>
     </properties>
+
 
     <dependencies>
         <dependency>
@@ -120,7 +123,7 @@
             <version>3.0.0</version>
         </dependency>
         <!-- 本地视频点播 -->
-        <dependency>
+   <!--     <dependency>
             <groupId>ali-vod</groupId>
             <artifactId>java-sdk-vod</artifactId>
             <version>2.1.0</version>
@@ -129,11 +132,22 @@
             <groupId>ali-vod</groupId>
             <artifactId>java-vod-upload</artifactId>
             <version>1.1.1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>ccp-sms-sdk</groupId>
             <artifactId>ccp-sms-sdk</artifactId>
             <version>2.6.3r</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-vod</artifactId>
+            <version>2.7.0</version>
         </dependency>
 
 
@@ -181,6 +195,12 @@
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <version>1.4.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.jpush.api</groupId>
+            <artifactId>jpush-client</artifactId>
+            <version>3.3.4</version>
         </dependency>
     </dependencies>
 

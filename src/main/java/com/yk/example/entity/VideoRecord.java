@@ -46,6 +46,8 @@ public class VideoRecord extends BaseEntity {
     @Column(name = "comment_num", columnDefinition = " numeric(10,0) comment '评论数目' ")
     private int commentNum;
 
+    @Column(name = "video_img_url", columnDefinition = "varchar(255) comment '视频图片url'")
+    private String videoImgUrl;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")
@@ -73,8 +75,6 @@ public class VideoRecord extends BaseEntity {
     @ApiModelProperty(value = "用户是否点赞", name = "status")
     @Transient
     private boolean isZan;
-
-
 
 
     public boolean isFollow() {
@@ -195,5 +195,13 @@ public class VideoRecord extends BaseEntity {
 
     public void setViewAuth(ViewAuth viewAuth) {
         this.viewAuth = viewAuth;
+    }
+
+    public String getVideoImgUrl() {
+        return videoImgUrl;
+    }
+
+    public void setVideoImgUrl(String videoImgUrl) {
+        this.videoImgUrl = videoImgUrl;
     }
 }

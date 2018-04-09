@@ -332,6 +332,19 @@ public class UserController {
     }
 
     /**
+     *  修改用户的设备token和手机平台
+     * @param user
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "修改用户的设备token和手机平台")
+    @RequestMapping(value = "updateDeviceToken/{version}", method = RequestMethod.POST)
+    public ControllerResult updateDeviceToken(@RequestBody User user,@PathVariable String version){
+        userService.updateDeviceToken(user);
+        return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+    }
+
+    /**
      * @param login
      * @return
      * @throws ServletException
