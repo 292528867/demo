@@ -121,7 +121,7 @@ public class RechargeController {
             logger.info("验证签名是否通过：" + flag);
             if (flag) {
                 // 支付成功修改订单号状态
-                rechargeService.updatePayStatus(params.get("out_trade_no"), PayStatus.success);
+                rechargeService.updatePayStatus(params.get("out_trade_no"), PayStatus.success );
                 return "success";
             }
         } catch (AlipayApiException e) {

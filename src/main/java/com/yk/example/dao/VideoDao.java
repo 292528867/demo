@@ -1,6 +1,9 @@
 package com.yk.example.dao;
 
+import com.yk.example.entity.User;
 import com.yk.example.entity.VideoRecord;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +30,6 @@ public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecif
 
     @Query(" from VideoRecord vr where vr.user.id = ?1")
     List<VideoRecord> findByUserId(String userId);
+
+    Page<VideoRecord> findByUser(User user, Pageable pageable);
 }

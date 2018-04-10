@@ -138,7 +138,6 @@
             <artifactId>ccp-sms-sdk</artifactId>
             <version>2.6.3r</version>
         </dependency>
-
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>

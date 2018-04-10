@@ -1,6 +1,10 @@
 package com.yk.example.dao;
 
+import com.yk.example.entity.User;
 import com.yk.example.entity.VideoCollect;
+import com.yk.example.entity.VideoRecord;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,6 +18,5 @@ public interface VideoCollectDao extends CrudRepository<VideoCollect, String>, J
     @Query(" from VideoCollect vc where vc.videoRecord.id = ?1 and vc.user.userId = ?2 ")
     VideoCollect existCollect(String id, String userId);
 
-    @Query(" from VideoCollect vc where  vc.user.userId = ?1 ")
-    List<VideoCollect> findByUser(String userId);
+    Page<VideoCollect> findByUser(User one, Pageable pageable);
 }

@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name = "t_video_collect")
 public class VideoCollect extends BaseEntity{
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "video_id")
     private VideoRecord videoRecord;
 

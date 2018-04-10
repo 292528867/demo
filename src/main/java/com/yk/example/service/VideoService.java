@@ -8,6 +8,8 @@ import com.yk.example.entity.VideoZan;
 import com.yk.example.enums.ZanStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,6 +35,9 @@ public class VideoService {
 
     @Autowired
     private UserFollowDao userFollowDao;
+
+    @Autowired
+    private UserDao userDao;
 
     public List<VideoRecord> nearby(double longitude, double latitude, int page, int size) {
         //先计算查询点的经纬度范围
@@ -105,8 +110,8 @@ public class VideoService {
         return videoRecord;
     }
 
-    public List<VideoRecord> findByUser(String userId) {
-        List<VideoRecord> videoRecords = videoDao.findByUserId(userId);
+    public Page<VideoRecord> findByUser(String userId, Pageable pageable) {
+        Page<VideoRecord> videoRecords = videoDao.findByUser(userDao.findOne(userId),pageable);
         return videoRecords;
     }
 }

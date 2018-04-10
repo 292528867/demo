@@ -1,9 +1,12 @@
 package com.yk.example.service;
 
+import com.yk.example.dao.UserDao;
 import com.yk.example.dao.VideoCollectDao;
 import com.yk.example.entity.VideoCollect;
 import com.yk.example.entity.VideoRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +21,9 @@ public class VideoCollectService {
     @Autowired
     private VideoCollectDao videoCollectDao;
 
+    @Autowired
+    private UserDao userDao;
+
     public VideoCollect existCollect(String id, String userId) {
         VideoCollect videoCollect = videoCollectDao.existCollect(id, userId);
         return videoCollect;
@@ -27,14 +33,9 @@ public class VideoCollectService {
         videoCollectDao.save(videoCollect);
     }
 
-    public List<VideoRecord> findByUserId(String userId) {
-        List<VideoRecord> videoRecords = new ArrayList<>();
-        List<VideoCollect> collects = videoCollectDao.findByUser(userId);
-        if (collects != null && collects.size() > 0) {
-            for (VideoCollect vc : collects) {
-                videoRecords.add(vc.getVideoRecord());
-            }
-        }
-        return videoRecords;
+    public Page<VideoCollect> findByUserId(String userId, Pageable pageable) {
+        Page<VideoCollect> collects = videoCollectDao.findByUser(userDao.findOne(userId), pageable);
+
+        return collects;
     }
 }

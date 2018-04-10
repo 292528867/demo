@@ -29,6 +29,12 @@ public class RechargeRecord {
     @Column(name = "money",columnDefinition = " DECIMAL(9,2) comment '充值金额 '")
     private float money;
 
+    @Column(name = "ali_account",columnDefinition = " varchar(100) comment '支付宝账号 '")
+    private String aliAccount;
+
+    @Column(name = "ali_account_real_name",columnDefinition = " varchar(100) comment '支付宝账号真实姓名 '")
+    private String aliAccountRealName;
+
     @Column(name = "pay_type",columnDefinition = " varchar(2) comment '支付类型 0 支付宝 1 微信 2 银联 '")
     private PayType payType;
 
@@ -96,5 +102,21 @@ public class RechargeRecord {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getAliAccount() {
+        return aliAccount;
+    }
+
+    public void setAliAccount(String aliAccount) {
+        this.aliAccount = aliAccount;
+    }
+
+    public String getAliAccountRealName() {
+        return aliAccountRealName;
+    }
+
+    public void setAliAccountRealName(String aliAccountRealName) {
+        this.aliAccountRealName = aliAccountRealName;
     }
 }

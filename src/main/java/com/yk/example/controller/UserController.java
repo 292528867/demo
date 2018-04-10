@@ -88,7 +88,7 @@ public class UserController {
 
                 // 密码进行md5加密
                 String password = user.getPassword();
-                if(StringUtils.isBlank(password)){
+                if (StringUtils.isBlank(password)) {
                     return new ControllerResult().setRet_code(1).setRet_values("")
                             .setMessage("密码不能为空");
                 }
@@ -97,7 +97,15 @@ public class UserController {
 
                 user.setUserType(UserType.app);
 
+                if (StringUtils.isBlank(user.getNickName())) {
+                    user.setNickName(RandomStringUtils.randomNumeric(8));
+                }
+                if (StringUtils.isBlank(user.getHeadImgUrl())) {
+                    user.setHeadImgUrl("https://pic.qqtn.com/up/2018-3/15223765997238966.jpg");
+                }
+
                 User newUser = userService.insertUser(user);
+
 
                 // 生成融云token
                 TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), user.getNickName(), user.getHeadImgUrl());
@@ -217,6 +225,12 @@ public class UserController {
             user = userService.findByPhone(phone);
             if (user == null) {
                 // 注册
+                if (StringUtils.isBlank(login.getNickName())) {
+                    user.setNickName(RandomStringUtils.randomNumeric(8));
+                }
+                if (StringUtils.isBlank(login.getHeadImgUrl())) {
+                    user.setHeadImgUrl("https://pic.qqtn.com/up/2018-3/15223765997238966.jpg");
+                }
                 login.setUserType(UserType.app);
                 User newUser = userService.insertUser(login);
                 // 生成融云token
@@ -252,6 +266,12 @@ public class UserController {
     @ApiOperation(value = "第三方登录")
     @RequestMapping(value = "thirdLogin/{version}", method = RequestMethod.POST)
     public ControllerResult thirdLogin(@RequestBody User thirdLogin, @PathVariable String version) {
+        if (StringUtils.isBlank(thirdLogin.getNickName())) {
+            thirdLogin.setNickName(RandomStringUtils.randomNumeric(8));
+        }
+        if (StringUtils.isBlank(thirdLogin.getHeadImgUrl())) {
+            thirdLogin.setHeadImgUrl("https://pic.qqtn.com/up/2018-3/15223765997238966.jpg");
+        }
         User user = userService.insertUser(thirdLogin);
         // 生成融云token
         TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
@@ -319,27 +339,29 @@ public class UserController {
     }
 
     /**
-     *  关注用户
+     * 关注用户
+     *
      * @param userFollow
      * @param version
      * @return
      */
     @ApiOperation(value = "关注用户")
     @RequestMapping(value = "followUser/{version}", method = RequestMethod.POST)
-    public ControllerResult followUser(@RequestBody UserFollow userFollow ,@PathVariable String version){
-       UserFollow  userFollow1 =  userFollowService.save(userFollow);
+    public ControllerResult followUser(@RequestBody UserFollow userFollow, @PathVariable String version) {
+        UserFollow userFollow1 = userFollowService.save(userFollow);
         return new ControllerResult().setRet_code(0).setRet_values(userFollow1).setMessage("");
     }
 
     /**
-     *  修改用户的设备token和手机平台
+     * 修改用户的设备token和手机平台
+     *
      * @param user
      * @param version
      * @return
      */
     @ApiOperation(value = "修改用户的设备token和手机平台")
     @RequestMapping(value = "updateDeviceToken/{version}", method = RequestMethod.POST)
-    public ControllerResult updateDeviceToken(@RequestBody User user,@PathVariable String version){
+    public ControllerResult updateDeviceToken(@RequestBody User user, @PathVariable String version) {
         userService.updateDeviceToken(user);
         return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
     }
@@ -351,18 +373,27 @@ public class UserController {
      */
     @ApiIgnore
     @RequestMapping(value = "/jwtLogin/{version}", method = RequestMethod.POST)
-    public String jwtLogin(@RequestBody User login, @PathVariable String version) throws ServletException {
+    public ControllerResult jwtLogin(@RequestBody User login, @PathVariable String version) throws ServletException {
 
         String jwtToken = "";
 
         String password = login.getPassword();
 
+        User user = userService.findByPhone(login.getPhone());
+
+        if (user == null) {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号未被注册");
+        }
+        if (!user.getPassword().equals(Md5Utlls.getMD5String(password))) {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("密码错误");
+        }
         Date date = new Date();
         DateTime dateTime = new DateTime(date);
         Date exprireDate = dateTime.plusMinutes(1).toDate();
         jwtToken = Jwts.builder().setSubject(login.getPhone()).setIssuedAt(date).setExpiration(exprireDate)
                 .signWith(SignatureAlgorithm.HS256, "secretkey").compact();
-        return jwtToken;
+        return new ControllerResult().setRet_code(0).setRet_values(jwtToken).setMessage("");
+
     }
 
 

@@ -3,13 +3,14 @@ package com.yk.example.controller;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.dto.VodAuth;
 import com.yk.example.entity.*;
-import com.yk.example.manage.UserInfoController;
 import com.yk.example.service.*;
 import com.yk.example.utils.VodUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -199,9 +200,9 @@ public class VideoController {
      */
     @ApiOperation(value = "我喜欢的视频")
     @RequestMapping(value = "myLike/{userId}/{version}", method = RequestMethod.GET)
-    public ControllerResult myLike(@PathVariable String version, @PathVariable String userId){
-        List<VideoRecord> videoRecords = videoCollectService.findByUserId(userId);
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+    public ControllerResult myLike(@PathVariable String version, @PathVariable String userId,int page,int size){
+        Page<VideoCollect> videoCollects = videoCollectService.findByUserId(userId,new PageRequest(page,size));
+        return new ControllerResult().setRet_code(0).setRet_values(videoCollects).setMessage("");
     }
 
     /**
@@ -212,8 +213,8 @@ public class VideoController {
      */
     @ApiOperation(value = "我的作品")
     @RequestMapping(value = "myVideo/{userId}/{version}", method = RequestMethod.GET)
-    public ControllerResult myVideo (@PathVariable String version, @PathVariable String userId){
-        List<VideoRecord> videoRecords = videoService.findByUser(userId);
+    public ControllerResult myVideo (@PathVariable String version, @PathVariable String userId, int page,int size){
+        Page<VideoRecord> videoRecords = videoService.findByUser(userId,new PageRequest(page,size));
         return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
     }
 }
