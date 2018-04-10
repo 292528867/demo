@@ -15,13 +15,12 @@ import com.yk.example.enums.PayStatus;
 import com.yk.example.enums.PayType;
 import com.yk.example.service.RechargeService;
 import com.yk.example.utils.WXPayUtils;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -34,7 +33,6 @@ import java.util.*;
 /**
  * Created by yk on 2018/3/28.
  */
-@ApiIgnore
 @RestController
 @RequestMapping("recharge")
 public class RechargeController {
@@ -58,8 +56,9 @@ public class RechargeController {
      * @param rechargeRecord
      * @return
      */
-    @RequestMapping(value = "/aliPay")
-    public ControllerResult aliPay(@RequestBody RechargeRecord rechargeRecord) {
+    @ApiOperation(value = "支付宝充值")
+    @RequestMapping(value = "/aliPay/{version}",method = RequestMethod.POST)
+    public ControllerResult aliPay(@RequestBody RechargeRecord rechargeRecord, @PathVariable String version) {
         //生成充值订单记录
         rechargeRecord.setPayType(PayType.zfb);
         RechargeRecord newRecharge = rechargeService.save(rechargeRecord);
@@ -95,6 +94,7 @@ public class RechargeController {
      * @param request
      * @param response
      */
+    @ApiIgnore
     @RequestMapping(value = "aliPayNotify")
     public String aliPayNotify(HttpServletRequest request, HttpServletResponse response) {
         logger.info("--------支付宝支付通知notify-----");
@@ -136,6 +136,7 @@ public class RechargeController {
      * @param rechargeRecord
      * @return
      */
+    @ApiIgnore
     @RequestMapping(value = "wxPay")
     public ControllerResult wxPay(@RequestBody RechargeRecord rechargeRecord, HttpServletRequest request) {
         //生成充值订单记录
@@ -184,6 +185,7 @@ public class RechargeController {
      * @return
      * @throws Exception
      */
+    @ApiIgnore
     @RequestMapping(value = "wxPayNotify")
     public String wxPayNotify(HttpServletRequest request) throws Exception {
         logger.info("--------微信支付通知notify开始-----");
