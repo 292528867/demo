@@ -18,6 +18,7 @@ public class UserInfo {
     @Id
     @GenericGenerator(name = "idGenerator", strategy = "uuid")
     @GeneratedValue(generator = "idGenerator")
+    @Column(length = 32)
     private String id;
 
     @Column(name = "last_longitude", columnDefinition = " numeric(10,5) comment '最后的经度' ")
@@ -34,6 +35,9 @@ public class UserInfo {
 
     @Column(name = "zan_num", columnDefinition = " bigint  comment '赞的数量' ")
     private long zanNum;
+
+    @Column(name = "address", columnDefinition = " varchar(100)  comment '所在地' ")
+    private String address;
 
     @Column(name = "birth", columnDefinition = " varchar(20)  comment '生日' ")
     private String birth;
@@ -159,5 +163,13 @@ public class UserInfo {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

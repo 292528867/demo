@@ -28,6 +28,7 @@ public class User implements Serializable {
     @Id
     @GenericGenerator(name = "idGenerator", strategy = "uuid")
     @GeneratedValue(generator = "idGenerator")
+    @Column(length = 32)
     private String userId;
 
     @ApiModelProperty(value = "手机号", name = "phone")

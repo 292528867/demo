@@ -98,4 +98,14 @@ public class Md5Utlls {
         stringbuffer.append(c1);
     }
 
+    /**
+     *   生成邀请码
+     * @param uuid
+     * @return
+     */
+    public static String generateInviteCode(String uuid){
+        return "";
+    }
+
+
 }

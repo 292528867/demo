@@ -1,7 +1,9 @@
 package com.yk.example.controller;
 
+import com.aliyuncs.auth.sts.AssumeRoleResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.ProtocolType;
 import com.yk.example.dto.ControllerResult;
-import com.yk.example.dto.VodAuth;
 import com.yk.example.entity.*;
 import com.yk.example.service.*;
 import com.yk.example.utils.VodUtils;
@@ -9,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +28,6 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
-
     @Autowired
     private VideoTagService videoTagService;
 
@@ -41,6 +43,11 @@ public class VideoController {
     @Autowired
     private UserFollowService userFollowService;
 
+    @Value("${AccessKeyId}")
+    private String accessKeyId;
+
+    @Value("${AccessKeySecret}")
+    private String accessKeySecret;
 
     /**
      * 查询附近的用户最新的视频
@@ -149,33 +156,47 @@ public class VideoController {
     }
 
     /**
-     * 获取短视频上传凭证
+     * 获取ststoken
      *
      * @param version
-     * @param fileName
-     * @param userId
-     * @param title
      * @return
      */
-    @ApiOperation(value = "获取短视频上传凭证")
-    @RequestMapping(value = "createUploadVideo/{version}", method = RequestMethod.GET)
-    public ControllerResult createUploadVideo(@PathVariable String version, String fileName, String userId, String title) {
-        VodAuth vodAuth = VodUtils.createUploadVideo(userId + "_" + System.currentTimeMillis() + "_" + fileName, title);
-        return new ControllerResult().setRet_code(0).setRet_values(vodAuth).setMessage("");
+    @ApiOperation(value = "获取ststoken")
+    @RequestMapping(value = "getStsToken/{version}", method = RequestMethod.GET)
+    public ControllerResult getStsToken(@PathVariable String version) {
+        String roleArn = "acs:ram::1358121793615316:role/ramupload";
+        String roleSessionName = "miaoou_upload";
+        String policy = "{\n" +
+                "  \"Version\": \"1\",\n" +
+                "  \"Statement\": [\n" +
+                "    {\n" +
+                "      \"Action\": \"vod:CreateUploadVideo\",\n" +
+                "      \"Resource\": \"*\",\n" +
+                "      \"Effect\": \"Allow\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        try {
+            AssumeRoleResponse response = VodUtils.assumeRole(accessKeyId, accessKeySecret, roleArn, roleSessionName, policy, ProtocolType.HTTPS);
+            return new ControllerResult().setRet_code(0).setRet_values(response.getCredentials()).setMessage("");
+        } catch (ClientException e) {
+            e.printStackTrace();
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("获取失败");
+        }
     }
 
     /**
-     * 刷新短视频上传凭证
-     *
+     *  上传短视频
+     * @param videoRecord
      * @param version
-     * @param aliVideoId
      * @return
      */
-    @ApiOperation(value = "刷新短视频上传凭证")
-    @RequestMapping(value = "refreshUploadVideo/{version}", method = RequestMethod.GET)
-    public ControllerResult refreshUploadVideo(@PathVariable String version, String aliVideoId) {
-        VodUtils.refreshUploadVideo(aliVideoId);
-        return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+    @ApiOperation(value = "上传短视频")
+    @RequestMapping(value = "uploadVideo/{version}", method = RequestMethod.POST)
+    public ControllerResult uploadVideo(@RequestBody VideoRecord videoRecord,@PathVariable String version){
+        VideoRecord newVideo = videoService.save(videoRecord);
+        return new ControllerResult().setRet_code(0).setRet_values(newVideo).setMessage("");
     }
 
     /**
@@ -193,28 +214,30 @@ public class VideoController {
     }
 
     /**
-     *  我喜欢的视频
+     * 我喜欢的视频
+     *
      * @param version
      * @param userId
      * @return
      */
     @ApiOperation(value = "我喜欢的视频")
     @RequestMapping(value = "myLike/{userId}/{version}", method = RequestMethod.GET)
-    public ControllerResult myLike(@PathVariable String version, @PathVariable String userId,int page,int size){
-        Page<VideoCollect> videoCollects = videoCollectService.findByUserId(userId,new PageRequest(page,size));
+    public ControllerResult myLike(@PathVariable String version, @PathVariable String userId, int page, int size) {
+        Page<VideoCollect> videoCollects = videoCollectService.findByUserId(userId, new PageRequest(page, size));
         return new ControllerResult().setRet_code(0).setRet_values(videoCollects).setMessage("");
     }
 
     /**
-     *  我的作品
+     * 我的作品
+     *
      * @param version
      * @param userId
      * @return
      */
     @ApiOperation(value = "我的作品")
     @RequestMapping(value = "myVideo/{userId}/{version}", method = RequestMethod.GET)
-    public ControllerResult myVideo (@PathVariable String version, @PathVariable String userId, int page,int size){
-        Page<VideoRecord> videoRecords = videoService.findByUser(userId,new PageRequest(page,size));
+    public ControllerResult myVideo(@PathVariable String version, @PathVariable String userId, int page, int size) {
+        Page<VideoRecord> videoRecords = videoService.findByUser(userId, new PageRequest(page, size));
         return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
     }
 }

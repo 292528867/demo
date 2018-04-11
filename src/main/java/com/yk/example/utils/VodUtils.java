@@ -2,9 +2,14 @@ package com.yk.example.utils;
 
 
 import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.auth.sts.AssumeRoleRequest;
+import com.aliyuncs.auth.sts.AssumeRoleResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.http.ProtocolType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.profile.IClientProfile;
 import com.aliyuncs.vod.model.v20170321.CreateUploadVideoRequest;
 import com.aliyuncs.vod.model.v20170321.CreateUploadVideoResponse;
 import com.aliyuncs.vod.model.v20170321.RefreshUploadVideoRequest;
@@ -12,7 +17,6 @@ import com.aliyuncs.vod.model.v20170321.RefreshUploadVideoResponse;
 import com.yk.example.dto.VodAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 
 /**
@@ -32,92 +36,82 @@ public class VodUtils {
      */
     private static final String accessKeySecret = "BoiKZRrXvpVG05iIRLb37DEg93t637";
 
-    private static final DefaultAcsClient aliyunClient = new DefaultAcsClient(
-            DefaultProfile.getProfile("cn-shanghai", accessKeyId, accessKeySecret));
-
-
-    public static void main(String[] args){
-        DefaultAcsClient aliyunClient;
-        aliyunClient = new DefaultAcsClient(
-                DefaultProfile.getProfile("cn-shanghai",accessKeyId,accessKeySecret));
-        String videoId = createUploadVideo(aliyunClient, "test867789.mp4", 1000);
-        System.out.println("VideoId:"+videoId);
-        //refreshUploadVideo(aliyunClient, videoId);
-    }
-    private static String createUploadVideo(DefaultAcsClient client,String fileName, long fileSize) {
-        CreateUploadVideoRequest request = new CreateUploadVideoRequest();
-        CreateUploadVideoResponse response = null;
-        try {
-            request.setFileName(fileName);
-            request.setFileSize(Long.valueOf(fileSize));
-            request.setTitle(fileName);
-
-            response = client.getAcsResponse(request);
-        } catch (ServerException e) {
-            System.out.println("CreateUploadVideoRequest Server Exception:");
-            e.printStackTrace();
-        } catch (ClientException e) {
-            System.out.println("CreateUploadVideoRequest Client Exception:");
-            e.printStackTrace();
-        }
-        System.out.println("RequestId:"+response.getRequestId());
-        System.out.println("UploadAuth:"+response.getUploadAuth());
-        System.out.println("Address:"+response.getUploadAddress());
-        return response.getVideoId();
-    }
 
     /**
-     * 获取上传凭证
-     *
-     * @param fileName
-     * @param title
-     * @return
+     * 目前只有"cn-hangzhou"这个region可用, 不要使用填写其他region的值
      */
-    public static VodAuth createUploadVideo(String fileName, String title) {
-
-        CreateUploadVideoRequest request = new CreateUploadVideoRequest();
-        CreateUploadVideoResponse response = null;
-        try {
-              /*必选，视频源文件名称（必须带后缀, 支持 ".3gp", ".asf", ".avi", ".dat", ".dv", ".flv", ".f4v", ".gif", ".m2t", ".m3u8", ".m4v", ".mj2", ".mjpeg", ".mkv", ".mov", ".mp4", ".mpe", ".mpg", ".mpeg", ".mts", ".ogg", ".qt", ".rm", ".rmvb", ".swf", ".ts", ".vob", ".wmv", ".webm"".aac", ".ac3", ".acm", ".amr", ".ape", ".caf", ".flac", ".m4a", ".mp3", ".ra", ".wav", ".wma"）*/
-            request.setFileName("1111.mp4");
-            //必选，视频标题
-            request.setTitle("test");
-            request.setFileSize(Long.valueOf(1000));
-            response = aliyunClient.getAcsResponse(request);
-        } catch (ServerException e) {
-            logger.info("CreateUploadVideoRequest Server Exception:");
-            e.printStackTrace();
-            return null;
-        } catch (ClientException e) {
-            logger.info("CreateUploadVideoRequest Client Exception:");
-            e.printStackTrace();
-            return null;
-        }
-        return new VodAuth(response.getRequestId(), response.getUploadAuth(), response.getVideoId(), response.getUploadAddress());
-    }
+    public static final String REGION_CN_HANGZHOU = "cn-hangzhou";
 
     /**
-     * 刷新上传凭证
-     *
-     * @param videoId
+     * 当前 STS API 版本
      */
-    public static void refreshUploadVideo(String videoId) {
-        RefreshUploadVideoRequest request = new RefreshUploadVideoRequest();
-        RefreshUploadVideoResponse response = null;
+    public static final String STS_API_VERSION = "2015-04-01";
+
+
+    public static AssumeRoleResponse assumeRole(String accessKeyId, String accessKeySecret,
+                                         String roleArn, String roleSessionName, String policy,
+                                         ProtocolType protocolType) throws ClientException {
         try {
-            request.setVideoId(videoId);
-            response = aliyunClient.getAcsResponse(request);
-        } catch (ServerException e) {
-            System.out.println("RefreshUploadVideoRequest Server Exception:");
-            e.printStackTrace();
-            return;
+            // 创建一个 Aliyun Acs Client, 用于发起 OpenAPI 请求
+            IClientProfile profile = DefaultProfile.getProfile(REGION_CN_HANGZHOU, accessKeyId, accessKeySecret);
+            DefaultAcsClient client = new DefaultAcsClient(profile);
+            // 创建一个 AssumeRoleRequest 并设置请求参数
+            final AssumeRoleRequest request = new AssumeRoleRequest();
+            request.setVersion(STS_API_VERSION);
+            request.setMethod(MethodType.POST);
+            request.setProtocol(protocolType);
+            request.setRoleArn(roleArn);
+            request.setRoleSessionName(roleSessionName);
+            request.setPolicy(policy);
+            // 发起请求，并得到response
+            final AssumeRoleResponse response = client.getAcsResponse(request);
+            return response;
         } catch (ClientException e) {
-            System.out.println("RefreshUploadVideoRequest Client Exception:");
-            e.printStackTrace();
-            return;
+            throw e;
         }
-        System.out.println("RequestId:" + response.getRequestId());
-        System.out.println("UploadAuth:" + response.getUploadAuth());
     }
+
+    public static void main(String[] args) {
+        // 只有 RAM用户（子账号）才能调用 AssumeRole 接口
+        // 阿里云主账号的AccessKeys不能用于发起AssumeRole请求
+        // 请首先在RAM控制台创建一个RAM用户，并为这个用户创建AccessKeys
+ /*       String accessKeyId = Env.AK;
+        String accessKeySecret = Env.AS;*/
+        // AssumeRole API 请求参数: RoleArn, RoleSessionName, Policy, and DurationSeconds
+        // RoleArn 需要在 RAM 控制台上获取
+        String roleArn = "acs:ram::1358121793615316:role/ramupload";
+        // RoleSessionName 是临时Token的会话名称，自己指定用于标识你的用户，主要用于审计，或者用于区分Token颁发给谁
+        // 但是注意RoleSessionName的长度和规则，不要有空格，只能有'-' '_' 字母和数字等字符
+        // 具体规则请参考API文档中的格式要求
+        String roleSessionName = "miaoou_upload";
+        // 如何定制你的policy?
+        String policy = "{\n" +
+                "  \"Version\": \"1\",\n" +
+                "  \"Statement\": [\n" +
+                "    {\n" +
+                "      \"Action\": \"vod:CreateUploadVideo\",\n" +
+                "      \"Resource\": \"*\",\n" +
+                "      \"Effect\": \"Allow\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        // 此处必须为 HTTPS
+        ProtocolType protocolType = ProtocolType.HTTPS;
+        try {
+            final AssumeRoleResponse response = assumeRole(accessKeyId, accessKeySecret,
+                    roleArn, roleSessionName, policy, protocolType);
+
+           /* createUploadVideo(response.getCredentials().getAccessKeyId(),
+                    response.getCredentials().getAccessKeySecret(),
+                    response.getCredentials().getSecurityToken());*/
+        } catch (ClientException e) {
+            logger.info("Failed to get a token.");
+            logger.info("Error code: " + e.getErrCode());
+            logger.info("Error message: " + e.getErrMsg());
+        }
+    }
+
+
+
 
 }

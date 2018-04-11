@@ -84,26 +84,26 @@ public class VideoService {
 
     public VideoRecord findOne(String videoId, String userId) {
         VideoRecord videoRecord = videoDao.findOne(videoId);
-        if(StringUtils.isNotBlank(userId)){
-             // 判断是否点赞
+        if (StringUtils.isNotBlank(userId)) {
+            // 判断是否点赞
             VideoZan videoZan = videoZanDao.isZan(videoId, userId);
-            if(videoZan == null){
-                 videoRecord.setZan(false);
-            }else {
-                 if(videoZan.getZanStatus().equals(ZanStatus.zan)){
-                     videoRecord.setZan(true);
-                 }else {
-                     videoRecord.setZan(false);
-                 }
+            if (videoZan == null) {
+                videoRecord.setZan(false);
+            } else {
+                if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
+                    videoRecord.setZan(true);
+                } else {
+                    videoRecord.setZan(false);
+                }
             }
             // 判断 是否关注
-          UserFollow userFollow = userFollowDao.existsFollow(userId, videoRecord.getUser().getUserId());
-           if(userFollow == null){
-               videoRecord.setFollow(false);
-           }else {
-               videoRecord.setFollow(true);
-           }
-        }else {
+            UserFollow userFollow = userFollowDao.existsFollow(userId, videoRecord.getUser().getUserId());
+            if (userFollow == null) {
+                videoRecord.setFollow(false);
+            } else {
+                videoRecord.setFollow(true);
+            }
+        } else {
             videoRecord.setZan(false);
             videoRecord.setFollow(false);
         }
@@ -111,7 +111,11 @@ public class VideoService {
     }
 
     public Page<VideoRecord> findByUser(String userId, Pageable pageable) {
-        Page<VideoRecord> videoRecords = videoDao.findByUser(userDao.findOne(userId),pageable);
+        Page<VideoRecord> videoRecords = videoDao.findByUser(userDao.findOne(userId), pageable);
         return videoRecords;
+    }
+
+    public VideoRecord save(VideoRecord videoRecord) {
+        return videoDao.save(videoRecord);
     }
 }

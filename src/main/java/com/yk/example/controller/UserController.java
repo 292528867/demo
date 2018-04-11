@@ -2,6 +2,7 @@ package com.yk.example.controller;
 
 import com.yk.example.dao.UserDao;
 import com.yk.example.dto.ControllerResult;
+import com.yk.example.dto.UserInfoDto;
 import com.yk.example.dto.UserLocation;
 import com.yk.example.entity.User;
 import com.yk.example.entity.UserFollow;
@@ -327,15 +328,29 @@ public class UserController {
     /**
      * 用户资料编辑
      *
-     * @param userInfo
+     * @param userInfoDto
      * @param version
      * @return
      */
     @ApiOperation(value = "用户资料编辑")
     @RequestMapping(value = "editUserInfo/{version}", method = RequestMethod.POST)
-    public ControllerResult editUserInfo(@RequestBody UserInfo userInfo, @PathVariable String version) {
-        UserInfo info = userInfoService.editUserInfo(userInfo);
-        return new ControllerResult().setRet_code(0).setRet_values(info).setMessage("修改成功");
+    public ControllerResult editUserInfo(@RequestBody UserInfoDto userInfoDto, @PathVariable String version) {
+        UserInfoDto UserInfoDto = userInfoService.editUserInfo(userInfoDto);
+        return new ControllerResult().setRet_code(0).setRet_values(UserInfoDto).setMessage("修改成功");
+    }
+
+
+    /**
+     * 用户资料查询
+     * @param userId
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "用户资料查询")
+    @RequestMapping(value = "personInfo/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult personInfo(@PathVariable String userId,@PathVariable String version){
+        UserInfoDto UserInfoDto = userInfoService.personInfo(userId);
+        return new ControllerResult().setRet_code(0).setRet_values(UserInfoDto).setMessage("");
     }
 
     /**

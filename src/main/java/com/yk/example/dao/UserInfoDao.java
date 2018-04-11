@@ -1,5 +1,6 @@
 package com.yk.example.dao;
 
+import com.yk.example.entity.User;
 import com.yk.example.entity.UserInfo;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,4 +20,6 @@ public interface UserInfoDao extends CrudRepository<UserInfo, String>, JpaSpecif
     @Modifying
     @Query("update UserInfo u set u.lastLongitude = ?1 ,u.lastLatitude = ?2 where u.user.userId = ?3 ")
     int updateUserLocation(double longitude, double latitude, String userId);
+
+    UserInfo findByUser(User user);
 }
