@@ -230,7 +230,7 @@ public class UserController {
         String password = login.getPassword();
         User user = null;
         // 验证码登陆
-        if (StringUtils.isNoneBlank(code)) {
+        if (StringUtils.isNotBlank(code)) {
             String redisCode = redisTemplate.opsForValue().get(login.getPhone() + "_login");
             if (!redisCode.equals(code)) {
                 return new ControllerResult().setRet_code(1).setRet_values("").setMessage("验证码错误");
