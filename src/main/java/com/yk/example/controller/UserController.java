@@ -65,7 +65,7 @@ public class UserController {
     @ApiOperation(value = "用户注册", notes = "返回的用户实体")
     @RequestMapping(value = "/register/{version}", method = RequestMethod.POST)
     public ControllerResult registerUser(@RequestBody User user, @PathVariable String version) {
-        //有推荐人手机号
+   /*     //有推荐人手机号
         String directRecommendUserPhone = user.getDirectRecommendUser();
         if (StringUtils.isNotBlank(directRecommendUserPhone)) {
             User directRecommendUser = userService.findByDirectRecommendUser(directRecommendUserPhone);
@@ -75,6 +75,19 @@ public class UserController {
             }
             // 设置推荐人的推荐人
             user.setSpaceRecommendUser(directRecommendUser.getDirectRecommendUser());
+        }*/
+        // 推荐码
+        String inviteCode = user.getInviteCode();
+        if (StringUtils.isNotBlank(inviteCode)) {
+            User inviteUser = userService.findByInviteCode(inviteCode);
+            if (inviteUser == null) {
+                return new ControllerResult().setRet_code(1).setRet_values("")
+                        .setMessage("非法的邀请码");
+            }
+            // 设置推荐人
+            user.setDirectRecommendUser(inviteUser.getUserId());
+            // 设置推荐人的推荐人
+            user.setSpaceRecommendUser(inviteUser.getDirectRecommendUser());
         }
         // 判断用户是否注册过
         User user1 = userService.findByPhone(user.getPhone());
@@ -342,13 +355,14 @@ public class UserController {
 
     /**
      * 用户资料查询
+     *
      * @param userId
      * @param version
      * @return
      */
     @ApiOperation(value = "用户资料查询")
     @RequestMapping(value = "personInfo/{userId}/{version}", method = RequestMethod.GET)
-    public ControllerResult personInfo(@PathVariable String userId,@PathVariable String version){
+    public ControllerResult personInfo(@PathVariable String userId, @PathVariable String version) {
         UserInfoDto UserInfoDto = userInfoService.personInfo(userId);
         return new ControllerResult().setRet_code(0).setRet_values(UserInfoDto).setMessage("");
     }

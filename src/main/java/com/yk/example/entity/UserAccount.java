@@ -8,8 +8,6 @@ import javax.persistence.Table;
  * 用户账号
  * Created by yk on 2018/4/2.
  */
-@Entity
-@Table(name = "t_user_account")
 public class UserAccount extends BaseEntity {
 
     @Column(name = "balance", columnDefinition = " decimal(10,2) comment '账户余额'")

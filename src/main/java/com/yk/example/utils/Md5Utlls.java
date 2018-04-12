@@ -1,5 +1,7 @@
 package com.yk.example.utils;
 
+import sun.security.provider.MD5;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,6 +9,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 /**
  * Created by yk on 2018/3/30.
@@ -99,12 +102,36 @@ public class Md5Utlls {
     }
 
     /**
-     *   生成邀请码
+     * 生成邀请码
+     *
      * @param uuid
      * @return
      */
-    public static String generateInviteCode(String uuid){
-        return "";
+    public static String generateInviteCode() {
+        return getCharAndNumr(6);
+    }
+
+
+    private static String getCharAndNumr(int length) {
+        String val = "";
+
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            // 输出字母还是数字
+            String charOrNum = random.nextInt(2) % 2 == 0 ? "char" : "num";
+            // 字符串
+            if ("char".equalsIgnoreCase(charOrNum)) {
+                //取得大写字母还是小写字母
+                int choice = random.nextInt(2) % 2 == 0 ? 65 : 97;
+                val += (char) (choice + random.nextInt(26));
+            }
+            // 数字
+            else if ("num".equalsIgnoreCase(charOrNum)) {
+                val += String.valueOf(random.nextInt(10));
+            }
+        }
+
+        return val;
     }
 
 

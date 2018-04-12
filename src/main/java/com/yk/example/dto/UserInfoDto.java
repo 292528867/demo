@@ -27,6 +27,25 @@ public class UserInfoDto implements Serializable {
 
     private String address;
 
+    private float accountIncome;
+
+    private float miaoPeas;
+
+    public float getAccountIncome() {
+        return accountIncome;
+    }
+
+    public void setAccountIncome(float accountIncome) {
+        this.accountIncome = accountIncome;
+    }
+
+    public float getMiaoPeas() {
+        return miaoPeas;
+    }
+
+    public void setMiaoPeas(float miaoPeas) {
+        this.miaoPeas = miaoPeas;
+    }
 
     public String getNickName() {
         return nickName;

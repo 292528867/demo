@@ -28,4 +28,7 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
     @Modifying
     @Query(" update User u set u.deviceToken = ?2 ,u.platform = ?3 where u.userId = ?1")
     void updateDeviceToken(String userId, String deviceToken, PlatForm platform);
+
+    User findByInviteCode(String inviteCode);
+
 }

@@ -67,10 +67,10 @@ public class User implements Serializable {
     private String isValid = "0";
 
     @ApiModelProperty(value = "直接推荐人", name = "directRecommendUser")
-    @Column(name = "direct_recommend_user", columnDefinition = "varchar(100) COMMENT '直接推荐人' ")
+    @Column(name = "direct_recommend_user", columnDefinition = "varchar(100) COMMENT '直接推荐人用户id' ")
     private String directRecommendUser;
 
-    @Column(name = "space_recommend_user", columnDefinition = "varchar(100) COMMENT '推荐人的推荐人' ")
+    @Column(name = "space_recommend_user", columnDefinition = "varchar(100) COMMENT '推荐人的推荐人用户id' ")
     private String spaceRecommendUser;
 
     @Column(name = "device_token", columnDefinition = "varchar(100) COMMENT '设备标识符' ")
@@ -85,6 +85,12 @@ public class User implements Serializable {
     @UpdateTimestamp
     private Date updateTime;
 
+    @Column(name = "vip ", columnDefinition = " varchar(255)  comment '1 是vip 0 不是vip' ")
+    private boolean vip = false;
+
+    @Column(name = "invite_code ", columnDefinition = " varchar(10)  comment '邀请码' ")
+    private String inviteCode;
+
 
     /**
      * 验证码 （非用户表中字段）
@@ -92,6 +98,23 @@ public class User implements Serializable {
     @ApiModelProperty(value = "验证码", name = "code")
     @Transient
     private String code;
+
+
+    public boolean isVip() {
+        return vip;
+    }
+
+    public void setVip(boolean vip) {
+        this.vip = vip;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
+    }
+
+    public void setInviteCode(String inviteCode) {
+        this.inviteCode = inviteCode;
+    }
 
     public String getCode() {
         return code;

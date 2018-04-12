@@ -74,6 +74,8 @@ public class UserInfoService {
         userInfoDto.setImpressionLabel(userInfo.getImpressionLabel());
         userInfoDto.setPersonalSign(userInfo.getPersonalSign());
         userInfoDto.setProfession(userInfo.getProfession());
+        userInfoDto.setAccountIncome(userInfo.getAccountIncome());
+        userInfoDto.setMiaoPeas(userInfo.getMiaoPeas());
         return userInfoDto;
     }
 }

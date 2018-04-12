@@ -51,6 +51,13 @@ public class UserInfo {
     @Column(name = "impression_label ", columnDefinition = " varchar(255)  comment '印象标签' ")
     private String impressionLabel;
 
+
+    @Column(name = "account_income", columnDefinition = " decimal(10,2) comment '账号收入'")
+    private float accountIncome;
+
+    @Column(name = "miao_peas", columnDefinition = " decimal(10,2) comment '秒豆'")
+    private float miaoPeas;
+
     @OneToOne()
     @JoinColumn(name = "user_id", columnDefinition = " varchar(50) comment '用户id ' ")
     private User user;
@@ -60,6 +67,22 @@ public class UserInfo {
 
     @UpdateTimestamp
     private Date updateTime;
+
+    public float getAccountIncome() {
+        return accountIncome;
+    }
+
+    public void setAccountIncome(float accountIncome) {
+        this.accountIncome = accountIncome;
+    }
+
+    public float getMiaoPeas() {
+        return miaoPeas;
+    }
+
+    public void setMiaoPeas(float miaoPeas) {
+        this.miaoPeas = miaoPeas;
+    }
 
     public String getId() {
         return id;
@@ -172,4 +195,6 @@ public class UserInfo {
     public void setAddress(String address) {
         this.address = address;
     }
+
+
 }
