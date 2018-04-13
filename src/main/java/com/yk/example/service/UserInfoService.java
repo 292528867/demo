@@ -8,6 +8,7 @@ import com.yk.example.dto.UserLocation;
 import com.yk.example.entity.User;
 import com.yk.example.entity.UserInfo;
 import com.yk.example.entity.UserLocationHistory;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,17 +48,43 @@ public class UserInfoService {
         User user = userDao.findOne(userId);
         UserInfo userInfo = userInfoDao.findByUser(user);
 
-        user.setHeadImgUrl(userInfoDto.getHeadImgUrl());
-        user.setNickName(userInfoDto.getNickName());
-        user.setSex(userInfoDto.getSex());
-        userDao.save(user);
+        if(StringUtils.isNotBlank(userInfoDto.getHeadImgUrl())){
+            user.setHeadImgUrl(userInfoDto.getHeadImgUrl());
+        }
+        if(StringUtils.isNotBlank(userInfoDto.getNickName())){
+            user.setNickName(userInfoDto.getNickName());
+        }
+        if(userInfoDto.getSex() != null){
+            user.setSex(userInfoDto.getSex());
+        }
 
-        userInfo.setAddress(userInfoDto.getAddress());
-        userInfo.setBirth(userInfoDto.getBirth());
-        userInfo.setImpressionLabel(userInfoDto.getImpressionLabel());
-        userInfo.setPersonalSign(userInfoDto.getPersonalSign());
-        userInfo.setProfession(userInfoDto.getProfession());
-        userInfoDao.save(userInfo);
+        if(StringUtils.isNotBlank(userInfoDto.getAddress())){
+            userInfo.setAddress(userInfoDto.getAddress());
+        }
+        if(StringUtils.isNotBlank(userInfoDto.getBirth())){
+            userInfo.setBirth(userInfoDto.getBirth());
+        }
+        if(StringUtils.isNotBlank(userInfoDto.getImpressionLabel())){
+            userInfo.setImpressionLabel(userInfoDto.getImpressionLabel());
+        }
+        if(StringUtils.isNotBlank(userInfoDto.getPersonalSign())){
+            userInfo.setPersonalSign(userInfoDto.getPersonalSign());
+        }
+        if(StringUtils.isNotBlank(userInfoDto.getProfession())){
+            userInfo.setProfession(userInfoDto.getProfession());
+        }
+        User newUser = userDao.save(user);
+        UserInfo info = userInfoDao.save(userInfo);
+        userInfoDto.setHeadImgUrl(newUser.getHeadImgUrl());
+        userInfoDto.setNickName(newUser.getNickName());
+        userInfoDto.setSex(newUser.getSex());
+        userInfoDto.setAddress(info.getAddress());
+        userInfoDto.setBirth(info.getBirth());
+        userInfoDto.setImpressionLabel(info.getImpressionLabel());
+        userInfoDto.setPersonalSign(info.getPersonalSign());
+        userInfoDto.setProfession(info.getProfession());
+        userInfoDto.setAccountIncome(info.getAccountIncome());
+        userInfoDto.setMiaoPeas(info.getMiaoPeas());
         return userInfoDto;
     }
 
