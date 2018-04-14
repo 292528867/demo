@@ -62,6 +62,21 @@ public class RechargeService {
                 billDetail.setMoney(40);
                 billDetail.setUser(recommendUser);
                 billDetailDao.save(billDetail);
+                // 如果推荐人还有推荐人 则奖励10元
+                String spaceRecommendUserId = recommendUser.getDirectRecommendUser();
+                if(StringUtils.isNotBlank(spaceRecommendUserId)){
+                    User spaceRecommendUser = userDao.findOne(spaceRecommendUserId);
+                    UserInfo spaceRecommendUserInfo = userInfoDao.findByUser(spaceRecommendUser);
+                    float spaceUserAccountIncome = spaceRecommendUserInfo.getAccountIncome() + 10;
+                    spaceRecommendUserInfo.setAccountIncome(spaceUserAccountIncome);
+                    userInfoDao.save(spaceRecommendUserInfo);
+                    // 生成账单明细
+                    BillDetail billDetail1 = new BillDetail();
+                    billDetail1.setBillType(BillType.newIncome);
+                    billDetail1.setMoney(10);
+                    billDetail1.setUser(spaceRecommendUser);
+                    billDetailDao.save(billDetail1);
+                }
             }
         }
         // 修改用户秒豆 并生成账单

@@ -38,4 +38,9 @@ public class VideoCollectService {
 
         return collects;
     }
+
+    public long countByUserId(String userId) {
+
+        return videoCollectDao.countByUser(userDao.findOne(userId));
+    }
 }

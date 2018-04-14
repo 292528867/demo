@@ -118,4 +118,8 @@ public class VideoService {
     public VideoRecord save(VideoRecord videoRecord) {
         return videoDao.save(videoRecord);
     }
+
+    public long countByUserId(String userId) {
+        return videoDao.countByUser(userDao.findOne(userId));
+    }
 }

@@ -32,4 +32,6 @@ public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecif
     List<VideoRecord> findByUserId(String userId);
 
     Page<VideoRecord> findByUser(User user, Pageable pageable);
+
+    long countByUser(User user);
 }

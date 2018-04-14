@@ -4,6 +4,7 @@ import com.aliyuncs.auth.sts.AssumeRoleResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.ProtocolType;
 import com.yk.example.dto.ControllerResult;
+import com.yk.example.dto.UserInfoDto;
 import com.yk.example.entity.*;
 import com.yk.example.service.*;
 import com.yk.example.utils.VodUtils;
@@ -16,7 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yk on 2018/4/2.
@@ -42,6 +45,9 @@ public class VideoController {
 
     @Autowired
     private UserFollowService userFollowService;
+
+    @Autowired
+    private UserInfoService userInfoService;
 
     @Value("${AccessKeyId}")
     private String accessKeyId;
@@ -187,14 +193,15 @@ public class VideoController {
     }
 
     /**
-     *  上传短视频
+     * 上传短视频
+     *
      * @param videoRecord
      * @param version
      * @return
      */
     @ApiOperation(value = "上传短视频")
     @RequestMapping(value = "uploadVideo/{version}", method = RequestMethod.POST)
-    public ControllerResult uploadVideo(@RequestBody VideoRecord videoRecord,@PathVariable String version){
+    public ControllerResult uploadVideo(@RequestBody VideoRecord videoRecord, @PathVariable String version) {
         VideoRecord newVideo = videoService.save(videoRecord);
         return new ControllerResult().setRet_code(0).setRet_values(newVideo).setMessage("");
     }
@@ -224,7 +231,16 @@ public class VideoController {
     @RequestMapping(value = "myLike/{userId}/{version}", method = RequestMethod.GET)
     public ControllerResult myLike(@PathVariable String version, @PathVariable String userId, int page, int size) {
         Page<VideoCollect> videoCollects = videoCollectService.findByUserId(userId, new PageRequest(page, size));
-        return new ControllerResult().setRet_code(0).setRet_values(videoCollects).setMessage("");
+        UserInfo userInfo = userInfoService.findUserInfo(userId);
+        long videoNum = videoService.countByUserId(userId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("videoCollects", videoCollects);
+        result.put("zanNum", userInfo.getZanNum());
+        result.put("fanNum", userInfo.getFanNum());
+        result.put("followNum", userInfo.getFollowNum());
+        result.put("videoNum", videoNum);
+        result.put("likeNum", videoCollects.getTotalElements());
+        return new ControllerResult().setRet_code(0).setRet_values(result).setMessage("");
     }
 
     /**
@@ -238,6 +254,16 @@ public class VideoController {
     @RequestMapping(value = "myVideo/{userId}/{version}", method = RequestMethod.GET)
     public ControllerResult myVideo(@PathVariable String version, @PathVariable String userId, int page, int size) {
         Page<VideoRecord> videoRecords = videoService.findByUser(userId, new PageRequest(page, size));
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+        long likeNum = videoCollectService.countByUserId(userId);
+        UserInfo userInfo = userInfoService.findUserInfo(userId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("videoRecords", videoRecords);
+        result.put("zanNum", userInfo.getZanNum());
+        result.put("fanNum", userInfo.getFanNum());
+        result.put("followNum", userInfo.getFollowNum());
+        result.put("videoNum", videoRecords.getTotalElements());
+        result.put("likeNum", likeNum);
+        return new ControllerResult().setRet_code(0).setRet_values(result).setMessage("");
     }
+
 }

@@ -19,4 +19,6 @@ public interface VideoCollectDao extends CrudRepository<VideoCollect, String>, J
     VideoCollect existCollect(String id, String userId);
 
     Page<VideoCollect> findByUser(User one, Pageable pageable);
+
+    long countByUser(User one);
 }

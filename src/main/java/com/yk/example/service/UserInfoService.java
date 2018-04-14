@@ -105,4 +105,10 @@ public class UserInfoService {
         userInfoDto.setMiaoPeas(userInfo.getMiaoPeas());
         return userInfoDto;
     }
+
+    public UserInfo findUserInfo(String userId) {
+        User user = userDao.findOne(userId);
+        UserInfo userInfo = userInfoDao.findByUser(user);
+        return userInfo;
+    }
 }
