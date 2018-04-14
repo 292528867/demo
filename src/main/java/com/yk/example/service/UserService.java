@@ -5,6 +5,7 @@ import com.yk.example.dao.UserInfoDao;
 import com.yk.example.entity.User;
 import com.yk.example.entity.UserInfo;
 import com.yk.example.utils.Md5Utlls;
+import javassist.bytecode.ExceptionsAttribute;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,5 +112,10 @@ public class UserService {
     public User findByInviteCode(String inviteCode) {
         User user = userDao.findByInviteCode(inviteCode);
         return user;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateHeadImgUrl(String userId, String headImageUrl) {
+        userDao.updateHeadImgUrl(userId, headImageUrl);
     }
 }

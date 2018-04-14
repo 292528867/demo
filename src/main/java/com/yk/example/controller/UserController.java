@@ -24,11 +24,18 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.ServletException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -42,9 +49,6 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    private UserDao userDao;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
@@ -55,6 +59,12 @@ public class UserController {
 
     @Autowired
     private UserFollowService userFollowService;
+
+    @Value("${avatar.path}")
+    private String avatarPath;
+
+    @Value("${avatar.url}")
+    private String avatarUrl;
 
     /**
      * app 用户注册
@@ -395,6 +405,31 @@ public class UserController {
         return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
     }
 
+    /**
+     *  上传用户头像
+     * @param file
+     * @param userId
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "上传用户头像")
+    @RequestMapping(value = "uploadAvatar/{version}", method = RequestMethod.POST)
+    public ControllerResult uploadAvatar(MultipartFile file,String userId,@PathVariable  String version){
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        try {
+            FileOutputStream outputStream = new FileOutputStream(avatarPath+"/"+fileName);
+            outputStream.write(file.getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        String headImageUrl = avatarUrl + fileName;
+        userService.updateHeadImgUrl(userId,headImageUrl);
+        return new ControllerResult().setRet_code(0).setRet_values(Collections.singletonMap("url",headImageUrl)).setMessage("上传成功");
+    }
     /**
      * @param login
      * @return

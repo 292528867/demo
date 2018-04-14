@@ -31,4 +31,7 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
 
     User findByInviteCode(String inviteCode);
 
+    @Modifying
+    @Query("update User u set u.headImgUrl = ?2 where u.userId = ?1")
+    void updateHeadImgUrl(String userId, String headImageUrl);
 }
