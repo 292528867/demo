@@ -17,6 +17,6 @@ public interface UserFollowDao extends CrudRepository<UserFollow,String>,JpaSpec
 
     List<UserFollow> findByFollowIdAndStatus(String userId, boolean status);
 
-    @Query(" select u.followId from UserFollow u where u.userId = ?1 and u.status = ?2 ")
+    @Query(" select distinct u.followId from UserFollow u where u.userId = ?1 and u.status = ?2 ")
     List<String> findByUserId(String userId,boolean status);
 }

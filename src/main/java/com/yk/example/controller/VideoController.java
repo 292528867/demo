@@ -176,7 +176,7 @@ public class VideoController {
                 "  \"Version\": \"1\",\n" +
                 "  \"Statement\": [\n" +
                 "    {\n" +
-                "      \"Action\": [\"vod:CreateUploadVideo\",\"vod:RefreshUploadVideo\",\"vod:CreateUploadImage\"],\n" +
+                "      \"Action\": [\"vod:*\",\"vod:CreateUploadVideo\",\"vod:RefreshUploadVideo\",\"vod:CreateUploadImage\"],\n" +
                 "      \"Resource\": \"*\",\n" +
                 "      \"Effect\": \"Allow\"\n" +
                 "    }\n" +
@@ -202,6 +202,9 @@ public class VideoController {
     @ApiOperation(value = "上传短视频")
     @RequestMapping(value = "uploadVideo/{version}", method = RequestMethod.POST)
     public ControllerResult uploadVideo(@RequestBody VideoRecord videoRecord, @PathVariable String version) {
+        if(videoRecord.getTag() == null || StringUtils.isBlank(videoRecord.getTag().getId())){
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("视频标签不能为空");
+        }
         VideoRecord newVideo = videoService.save(videoRecord);
         return new ControllerResult().setRet_code(0).setRet_values(newVideo).setMessage("");
     }

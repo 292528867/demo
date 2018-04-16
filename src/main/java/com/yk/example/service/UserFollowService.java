@@ -67,7 +67,9 @@ public class UserFollowService {
         if (byUserId != null && byUserId.size() > 0) {
             for (String id : byUserId) {
                 VideoRecord videoRecord = videoDao.findLastVideoByUser(id);
-                videoRecords.add(videoRecord);
+                if(videoRecord != null){
+                    videoRecords.add(videoRecord);
+                }
             }
         }
         return videoRecords;
