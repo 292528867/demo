@@ -11,12 +11,16 @@ import javax.persistence.*;
 @Table(name = "t_bill_detail")
 public class BillDetail extends BaseEntity {
 
-    @Column(name = "bill_type",columnDefinition = " varchar(2) comment '账单类型'")
+    @Column(name = "bill_type", columnDefinition = " varchar(2) comment '账单类型'")
     private BillType billType;
 
-    @Column(name = "money",columnDefinition = " DECIMAL(9,2) comment '账单类型'")
+    @Column(name = "money", columnDefinition = " DECIMAL(9,2) comment '账单类型'")
     private float money;
 
+
+    /**
+     * 推荐人(拿奖励的)
+     */
     @ManyToOne()
     @JoinColumn(name = "user_id")
     private User user;
@@ -44,4 +48,6 @@ public class BillDetail extends BaseEntity {
     public void setUser(User user) {
         this.user = user;
     }
+
+
 }

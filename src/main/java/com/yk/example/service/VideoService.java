@@ -1,10 +1,7 @@
 package com.yk.example.service;
 
 import com.yk.example.dao.*;
-import com.yk.example.entity.UserFollow;
-import com.yk.example.entity.UserInfo;
-import com.yk.example.entity.VideoRecord;
-import com.yk.example.entity.VideoZan;
+import com.yk.example.entity.*;
 import com.yk.example.enums.ZanStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +35,10 @@ public class VideoService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private VideoTagDao videoTagDao;
+
 
     public List<VideoRecord> nearby(double longitude, double latitude, int page, int size) {
         //先计算查询点的经纬度范围
@@ -121,5 +122,10 @@ public class VideoService {
 
     public long countByUserId(String userId) {
         return videoDao.countByUser(userDao.findOne(userId));
+    }
+
+    public Page<VideoRecord> findByTag(String tagId,Pageable pageable) {
+        Page<VideoRecord> videoRecords = videoDao.findByTag(videoTagDao.findOne(tagId), pageable);
+        return videoRecords;
     }
 }

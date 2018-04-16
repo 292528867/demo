@@ -406,7 +406,8 @@ public class UserController {
     }
 
     /**
-     *  上传用户头像
+     * 上传用户头像
+     *
      * @param file
      * @param userId
      * @param version
@@ -414,22 +415,37 @@ public class UserController {
      */
     @ApiOperation(value = "上传用户头像")
     @RequestMapping(value = "uploadAvatar/{version}", method = RequestMethod.POST)
-    public ControllerResult uploadAvatar(MultipartFile file,String userId,@PathVariable  String version){
+    public ControllerResult uploadAvatar(MultipartFile file, String userId, @PathVariable String version) {
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         try {
-            FileOutputStream outputStream = new FileOutputStream(avatarPath+"/"+fileName);
+            FileOutputStream outputStream = new FileOutputStream(avatarPath + "/" + fileName);
             outputStream.write(file.getBytes());
             outputStream.flush();
             outputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         String headImageUrl = avatarUrl + fileName;
-        userService.updateHeadImgUrl(userId,headImageUrl);
-        return new ControllerResult().setRet_code(0).setRet_values(Collections.singletonMap("url",headImageUrl)).setMessage("上传成功");
+        userService.updateHeadImgUrl(userId, headImageUrl);
+        return new ControllerResult().setRet_code(0).setRet_values(Collections.singletonMap("url", headImageUrl)).setMessage("上传成功");
     }
+
+
+    /**
+     * 用户退出登录
+     *
+     * @param userId
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "用户退出登录")
+    @RequestMapping(value = "loginOut/{userId}/{version}", method = RequestMethod.POST)
+    public ControllerResult loginOut(@PathVariable String userId, @PathVariable String version) {
+        return new ControllerResult().setRet_code(0).setRet_values("").setMessage("成功退出");
+    }
+
     /**
      * @param login
      * @return

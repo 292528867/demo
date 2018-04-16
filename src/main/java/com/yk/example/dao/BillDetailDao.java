@@ -7,9 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 /**
  * Created by yk on 2018/4/12.
  */
 public interface BillDetailDao  extends CrudRepository<BillDetail,String> ,JpaSpecificationExecutor{
     Page<BillDetail> findByUser(User one, Pageable pageable);
+
+    List<BillDetail> findByUser(User one);
 }

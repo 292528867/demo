@@ -100,6 +100,10 @@ public class User implements Serializable {
     private String code;
 
 
+    public User() {
+    }
+
+
     public boolean isVip() {
         return vip;
     }

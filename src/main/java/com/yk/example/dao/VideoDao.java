@@ -2,6 +2,7 @@ package com.yk.example.dao;
 
 import com.yk.example.entity.User;
 import com.yk.example.entity.VideoRecord;
+import com.yk.example.entity.VideoTag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -34,4 +35,6 @@ public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecif
     Page<VideoRecord> findByUser(User user, Pageable pageable);
 
     long countByUser(User user);
+
+    Page<VideoRecord> findByTag(VideoTag one, Pageable pageable);
 }
