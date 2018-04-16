@@ -176,7 +176,7 @@ public class VideoController {
                 "  \"Version\": \"1\",\n" +
                 "  \"Statement\": [\n" +
                 "    {\n" +
-                "      \"Action\": \"vod:CreateUploadVideo\",\n" +
+                "      \"Action\": [\"vod:CreateUploadVideo\",\"vod:RefreshUploadVideo\",\"vod:CreateUploadImage\"],\n" +
                 "      \"Resource\": \"*\",\n" +
                 "      \"Effect\": \"Allow\"\n" +
                 "    }\n" +
