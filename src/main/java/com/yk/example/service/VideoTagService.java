@@ -5,6 +5,8 @@ import com.yk.example.entity.User;
 import com.yk.example.entity.VideoTag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -37,5 +39,31 @@ public class VideoTagService {
             }
         };
         return videoTagDao.findAll(specification);
+    }
+
+    public Page<VideoTag> findAllPage(VideoTag tag, PageRequest pageRequest) {
+        Specification<VideoTag> specification = new Specification<VideoTag>() {
+            @Override
+            public Predicate toPredicate(Root<VideoTag> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicates = new ArrayList<>(); //所有的断言
+                if (StringUtils.isNotBlank(tag.getName())) {
+                    predicates.add(criteriaBuilder.like(root.get("name").as(String.class), tag.getName() + "%"));
+                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+        return videoTagDao.findAll(specification, pageRequest);
+    }
+
+    public VideoTag findOne(String id) {
+        return videoTagDao.findOne(id);
+    }
+
+    public void save(VideoTag tag) {
+        videoTagDao.save(tag);
+    }
+
+    public void delTage(String id) {
+         videoTagDao.delete(id);
     }
 }
