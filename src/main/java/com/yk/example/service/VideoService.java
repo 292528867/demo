@@ -124,8 +124,12 @@ public class VideoService {
         return videoDao.countByUser(userDao.findOne(userId));
     }
 
-    public Page<VideoRecord> findByTag(String tagId,Pageable pageable) {
-        Page<VideoRecord> videoRecords = videoDao.findByTag(videoTagDao.findOne(tagId), pageable);
+    public Page<VideoRecord> findByTag(String tagName, Pageable pageable) {
+        List<VideoTag> tags = videoTagDao.findByNameLike(tagName);
+        Page<VideoRecord> videoRecords = null;
+        if (tags != null && tags.size() > 0) {
+            videoRecords = videoDao.findByTagIn(tags, pageable);
+        }
         return videoRecords;
     }
 }

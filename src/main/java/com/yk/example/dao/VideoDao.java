@@ -37,4 +37,6 @@ public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecif
     long countByUser(User user);
 
     Page<VideoRecord> findByTag(VideoTag one, Pageable pageable);
+
+    Page<VideoRecord> findByTagIn(List<VideoTag> tags, Pageable pageable);
 }

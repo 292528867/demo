@@ -277,8 +277,8 @@ public class VideoController {
      */
     @ApiOperation(value = "根据视频标签搜索视频")
     @RequestMapping(value = "findVideoByTagName/{version}", method = RequestMethod.GET)
-    public ControllerResult findVideoByTagName(@PathVariable String version, String tagId, int page, int size) {
-        Page<VideoRecord> videoRecords = videoService.findByTag(tagId,new PageRequest(page,size));
+    public ControllerResult findVideoByTagName(@PathVariable String version, String tagName, int page, int size) {
+        Page<VideoRecord> videoRecords = videoService.findByTag(tagName,new PageRequest(page,size));
         return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
     }
 }
