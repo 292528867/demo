@@ -93,12 +93,12 @@
                                     <tr th:each="nc : ${userList}">
                                         <td th:text="${nc.nickName}"></td>
                                         <td th:text="${nc.phone}"></td>
-                                        <td th:switch="${nc.sex.toString()}"> <!-- sex是枚举类型 所以要用toString方法 -->
+                                        <td th:switch="${nc.sex}"> <!-- sex是枚举类型 所以要用toString方法 -->
                                             <p th:case="'male'">男</p>
                                             <p th:case="'female'">女</p>
                                             <p th:case="'unknow'">未知</p>
                                         </td>
-                                        <td th:switch="${nc.userType.toString()}">
+                                        <td th:switch="${nc.userType}">
                                             <p th:case="'wx'">微信</p>
                                             <p th:case="'qq'">qq</p>
                                             <p th:case="'app'">app</p>

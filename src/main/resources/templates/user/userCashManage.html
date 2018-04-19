@@ -77,9 +77,8 @@
                                     <tr>
                                         <th width="5%">用户昵称</th>
                                         <th width="30%">提现金额</th>
-                                        <th width="40%">提现卡号</th>
-                                        <th width="40%">提现银行</th>
-                                        <th width="40%">开户行</th>
+                                        <th width="40%">支付宝账号</th>
+                                        <th width="40%">支付宝名称</th>
                                         <th>操作</th>
                                     </tr>
                                     </thead>
@@ -87,9 +86,8 @@
                                     <tr th:each="nc : ${userCashList}">
                                         <td th:text="${nc.user.userId}"></td>
                                         <td th:text="${nc.money}"></td>
-                                        <td th:text="${nc.userBankCard.idNumber}"></td>
-                                        <td th:text="${nc.userBankCard.bankName}"></td>
-                                        <td th:text="${nc.userBankCard.depositBank}"></td>
+                                        <td th:text="${nc.zfbAccount}"></td>
+                                        <td th:text="${nc.zfbAccountName}"></td>
                                         <td>
 
                                         </td>
