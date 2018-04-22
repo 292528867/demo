@@ -39,4 +39,10 @@ public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecif
     Page<VideoRecord> findByTag(VideoTag one, Pageable pageable);
 
     Page<VideoRecord> findByTagIn(List<VideoTag> tags, Pageable pageable);
+    
+    List<VideoRecord> findTop10ByUserNot(User user);
+
+    List<VideoRecord> findTop10By();
+
+    List<VideoRecord> findByUser(User user);
 }

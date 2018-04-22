@@ -8,7 +8,10 @@ import com.yk.example.service.VideoCommentZanService;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.Controller;
 
 import java.util.List;
 
@@ -53,9 +56,9 @@ public class VideoCommentController {
      */
     @ApiOperation(value = "查询视频的评论列表")
     @RequestMapping(value = "findComment/{videoId}/{version}", method = RequestMethod.GET)
-    public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version) {
-        List<VideoComment> videoComments = videoCommentService.findAllByVideoId(videoId);
-        return new ControllerResult().setRet_code(0).setRet_values(videoComments).setMessage("");
+    public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version,int page ,int size) {
+        Page<VideoComment> videoCommentPage = videoCommentService.findAllByVideoId(videoId,new PageRequest(page,size));
+        return new ControllerResult().setRet_code(0).setRet_values(videoCommentPage).setMessage("");
     }
 
     /**
@@ -73,5 +76,20 @@ public class VideoCommentController {
             return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
         }
         return new ControllerResult().setRet_code(99).setRet_values("").setMessage("请先登录");
+    }
+
+    /**
+     *  评论的接口
+     * @param version
+     * @param userId
+     * @param page
+     * @param size
+     * @return
+     */
+    @ApiOperation(value = "评论的接口")
+    @RequestMapping(value = "allComment/{userId}/{version}",method = RequestMethod.GET)
+    public ControllerResult allComment(@PathVariable String version,@PathVariable String userId,int page ,int size){
+        Page<VideoComment> commentPage = videoCommentService.findAllCommentByUser(userId,new PageRequest(page,size));
+        return new ControllerResult().setRet_code(0).setRet_values(commentPage).setMessage("");
     }
 }

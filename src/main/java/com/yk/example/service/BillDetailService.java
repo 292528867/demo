@@ -5,6 +5,7 @@ import com.yk.example.dao.UserDao;
 import com.yk.example.dto.InviteRecordDto;
 import com.yk.example.entity.BillDetail;
 import com.yk.example.entity.User;
+import com.yk.example.enums.BillType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,7 +43,9 @@ public class BillDetailService {
     public Map<String, Object> inviteRecord(String userId) {
         Map<String, Object> result = new HashMap<>();
         List<InviteRecordDto> inviteRecordDtos = new ArrayList<>();
-        List<BillDetail> billDetails = billDetailDao.findByUser(userDao.findOne(userId));
+        User user = new User();
+        user.setUserId(userId);
+        List<BillDetail> billDetails = billDetailDao.findByUserAndBillType(user, BillType.newIncome);
         // 总奖励金额
         double totalMoney = 0;
         if (billDetails != null && billDetails.size() > 0) {

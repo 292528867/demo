@@ -76,6 +76,17 @@ public class VideoRecord extends BaseEntity {
     @Transient
     private boolean isZan;
 
+    @ApiModelProperty(value = "2个经纬度距离", name = "distance")
+    @Transient
+    private double distance;
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
 
     public boolean isFollow() {
         return isFollow;
@@ -204,4 +215,6 @@ public class VideoRecord extends BaseEntity {
     public void setVideoImgUrl(String videoImgUrl) {
         this.videoImgUrl = videoImgUrl;
     }
+
+
 }

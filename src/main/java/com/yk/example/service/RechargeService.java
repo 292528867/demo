@@ -45,7 +45,7 @@ public class RechargeService {
         // 如果充值金额大于90元 成为会员 并且给推荐人奖励40元
         RechargeRecord rechargeRecord = rechargeDao.findOne(rechargeId);
         User user = rechargeRecord.getUser();
-        if (rechargeRecord.getMoney() > 99) {
+        if (rechargeRecord.getMoney() > 0) {
             user.setVip(true);
             user = userDao.save(user);
             String directRecommendUser = user.getDirectRecommendUser();

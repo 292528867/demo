@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,5 +43,10 @@ public class VideoCollectService {
     public long countByUserId(String userId) {
 
         return videoCollectDao.countByUser(userDao.findOne(userId));
+    }
+
+    @Transactional
+    public void deleteCollect(String id) {
+        videoCollectDao.delete(id);
     }
 }

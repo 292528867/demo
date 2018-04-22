@@ -18,6 +18,7 @@ public class VideoCollect extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
+
     public VideoRecord getVideoRecord() {
         return videoRecord;
     }

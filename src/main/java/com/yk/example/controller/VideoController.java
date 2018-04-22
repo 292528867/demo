@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class VideoController {
                                    @ApiParam(name = "latitude", value = "纬度", required = true) double latitude,
                                    @PathVariable String version) {
         List<VideoRecord> videoRecords = videoService.nearby(longitude, latitude, 0, 0);
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
     }
 
     /**
@@ -84,7 +85,7 @@ public class VideoController {
     @RequestMapping(value = "recommend/{version}", method = RequestMethod.GET)
     public ControllerResult recommend(String userId, @PathVariable String version) {
         List<VideoRecord> videoRecords = videoService.recommend(userId);
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
     }
 
     /**
@@ -162,6 +163,19 @@ public class VideoController {
     }
 
     /**
+     * 取消秒转
+     *
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "删除秒选的视频")
+    @RequestMapping(value = "cancelCollect/{version}", method = RequestMethod.POST)
+    public ControllerResult cancelCollect(@PathVariable String version, @RequestBody VideoCollect videoCollect) {
+        videoCollectService.deleteCollect(videoCollect.getId());
+        return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+    }
+
+    /**
      * 获取ststoken
      *
      * @param version
@@ -176,7 +190,7 @@ public class VideoController {
                 "  \"Version\": \"1\",\n" +
                 "  \"Statement\": [\n" +
                 "    {\n" +
-                "      \"Action\": [\"vod:*\",\"vod:CreateUploadVideo\",\"vod:RefreshUploadVideo\",\"vod:CreateUploadImage\"],\n" +
+                "      \"Action\": [\"vod:GetPlayInfo\",\"vod:GetVideoPlayAuth\",\"vod:GetVideoPlayInfo\",\"vod:GetVideoInfo\",\"vod:CreateUploadVideo\",\"vod:RefreshUploadVideo\",\"vod:CreateUploadImage\"],\n" +
                 "      \"Resource\": \"*\",\n" +
                 "      \"Effect\": \"Allow\"\n" +
                 "    }\n" +
@@ -202,11 +216,28 @@ public class VideoController {
     @ApiOperation(value = "上传短视频")
     @RequestMapping(value = "uploadVideo/{version}", method = RequestMethod.POST)
     public ControllerResult uploadVideo(@RequestBody VideoRecord videoRecord, @PathVariable String version) {
-        if(videoRecord.getTag() == null || StringUtils.isBlank(videoRecord.getTag().getId())){
+        if (videoRecord.getTag() == null || StringUtils.isBlank(videoRecord.getTag().getId())) {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("视频标签不能为空");
         }
         VideoRecord newVideo = videoService.save(videoRecord);
         return new ControllerResult().setRet_code(0).setRet_values(newVideo).setMessage("");
+    }
+
+    /**
+     *  删除用户的视频
+     * @param version
+     * @param videoRecord
+     * @return
+     */
+    @ApiOperation(value = "删除用户的视频")
+    @RequestMapping(value = "deleteVideo/{version}", method = RequestMethod.POST)
+    public ControllerResult deleteVideo( @PathVariable String version, @RequestBody VideoRecord videoRecord){
+       boolean existVideo =   videoService.existVideo(videoRecord);
+        if(existVideo){
+            videoService.deleteVideo(videoRecord);
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("");
+        }
+        return new ControllerResult().setRet_code(1).setRet_values("").setMessage("用户没有权限删除该视频");
     }
 
     /**
@@ -220,7 +251,7 @@ public class VideoController {
     @RequestMapping(value = "allFollow/{userId}/{version}", method = RequestMethod.GET)
     public ControllerResult allFollow(@PathVariable String version, @PathVariable String userId) {
         List<VideoRecord> videoRecords = userFollowService.findByUserId(userId);
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
     }
 
     /**
@@ -278,7 +309,7 @@ public class VideoController {
     @ApiOperation(value = "根据视频标签搜索视频")
     @RequestMapping(value = "findVideoByTagName/{version}", method = RequestMethod.GET)
     public ControllerResult findVideoByTagName(@PathVariable String version, String tagName, int page, int size) {
-        Page<VideoRecord> videoRecords = videoService.findByTag(tagName,new PageRequest(page,size));
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords).setMessage("");
+        Page<VideoRecord> videoRecords = videoService.findByTag(tagName, new PageRequest(page, size));
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
     }
 }

@@ -3,11 +3,13 @@ package com.yk.example.service;
 import com.yk.example.dao.*;
 import com.yk.example.entity.*;
 import com.yk.example.enums.ZanStatus;
+import com.yk.example.utils.Distance;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +64,10 @@ public class VideoService {
             for (UserInfo userInfo : userInfos) {
                 // 查询用户的最后一个视频
                 VideoRecord videoRecord = videoDao.findLastVideoByUser(userInfo.getUser().getUserId());
-                videoRecords.add(videoRecord);
+                if(videoRecord != null){
+                    videoRecord.setDistance(Distance.getDistance(latitude,longitude,userInfo.getLastLatitude(),userInfo.getLastLongitude()));
+                    videoRecords.add(videoRecord);
+                }
             }
         }
         return videoRecords;
@@ -73,12 +78,11 @@ public class VideoService {
         List<VideoRecord> videoRecords = new ArrayList<>();
         // 登录了 按偏好推荐
         if (StringUtils.isNotBlank(userId)) {
-
+            User user = new User();
+            user.setUserId(userId);
+            videoRecords =  videoDao.findTop10ByUserNot(user);
         } else {
-            Iterable<VideoRecord> all = videoDao.findAll();
-            all.forEach(videoRecord -> {
-                videoRecords.add(videoRecord);
-            });
+            videoRecords  = videoDao.findTop10By();
         }
         return videoRecords;
     }
@@ -131,5 +135,18 @@ public class VideoService {
             videoRecords = videoDao.findByTagIn(tags, pageable);
         }
         return videoRecords;
+    }
+
+    public boolean existVideo(VideoRecord videoRecord) {
+        VideoRecord record = videoDao.findOne(videoRecord.getId());
+        if(record != null && record.getId().equals(videoRecord.getId())){
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public void deleteVideo(VideoRecord videoRecord) {
+        videoDao.delete(videoRecord.getId());
     }
 }

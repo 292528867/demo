@@ -10,9 +10,14 @@ import com.yk.example.entity.VideoZan;
 import com.yk.example.entity.ZanRecordHistory;
 import com.yk.example.enums.ZanStatus;
 import com.yk.example.enums.ZanType;
+import com.yk.example.utils.JPushUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.Date;
 
 /**
  * Created by yk on 2018/4/4.
@@ -58,6 +63,11 @@ public class VideoZanService {
         zanRecordHistory.setNickName(user.getNickName());
         zanRecordHistory.setHeadImgUrl(user.getHeadImgUrl());
         zanRecordHistoryDao.save(zanRecordHistory);
+        // 对被点赞人进行推送
+       /* if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
+            JPushUtils.sendAlias(user.getNickName() + "在" + new DateTime(new Date()).toString("yyyy-MM-dd hh:mm") + "点赞您的视频",
+                    Collections.singletonList(videoRecord.getUser().getUserId()),Collections.singletonMap("videoId",videoRecord.getId()));
+        }*/
         return zan;
     }
 }

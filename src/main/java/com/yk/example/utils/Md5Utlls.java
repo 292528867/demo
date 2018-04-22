@@ -1,5 +1,6 @@
 package com.yk.example.utils;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import sun.security.provider.MD5;
 
 import java.io.File;
@@ -108,7 +109,7 @@ public class Md5Utlls {
      * @return
      */
     public static String generateInviteCode() {
-        return getCharAndNumr(6);
+        return RandomStringUtils.randomNumeric(6);
     }
 
 

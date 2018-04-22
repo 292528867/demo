@@ -1,12 +1,11 @@
 package com.yk.example.controller;
 
-import com.yk.example.dao.UserDao;
+import com.google.gson.JsonObject;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.dto.UserInfoDto;
 import com.yk.example.dto.UserLocation;
 import com.yk.example.entity.User;
 import com.yk.example.entity.UserFollow;
-import com.yk.example.entity.UserInfo;
 import com.yk.example.enums.UserType;
 import com.yk.example.rongCloud.models.response.TokenResult;
 import com.yk.example.service.UserFollowService;
@@ -31,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.ServletException;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -66,6 +64,9 @@ public class UserController {
     @Value("${avatar.url}")
     private String avatarUrl;
 
+    @Value("${user_default_avatar_url}")
+    private String userDefaultAvatarUrl;
+
     /**
      * app 用户注册
      *
@@ -91,7 +92,7 @@ public class UserController {
         if (StringUtils.isNotBlank(inviteCode)) {
             User inviteUser = userService.findByInviteCode(inviteCode);
             if (inviteUser == null) {
-                return new ControllerResult().setRet_code(1).setRet_values("")
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap())
                         .setMessage("非法的邀请码");
             }
             // 设置推荐人
@@ -102,7 +103,7 @@ public class UserController {
         // 判断用户是否注册过
         User user1 = userService.findByPhone(user.getPhone());
         if (user1 != null) {
-            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("用户已注册");
+            return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("用户已注册");
         }
         // 验证码校验
         String redisCode = redisTemplate.opsForValue().get(user.getPhone() + "_reg");
@@ -113,7 +114,7 @@ public class UserController {
                 // 密码进行md5加密
                 String password = user.getPassword();
                 if (StringUtils.isBlank(password)) {
-                    return new ControllerResult().setRet_code(1).setRet_values("")
+                    return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap())
                             .setMessage("密码不能为空");
                 }
                 String newPassword = Md5Utlls.getMD5String(password);
@@ -125,23 +126,23 @@ public class UserController {
                     user.setNickName(RandomStringUtils.randomNumeric(8));
                 }
                 if (StringUtils.isBlank(user.getHeadImgUrl())) {
-                    user.setHeadImgUrl("https://pic.qqtn.com/up/2018-3/15223765997238966.jpg");
+                    user.setHeadImgUrl(userDefaultAvatarUrl);
                 }
 
                 User newUser = userService.insertUser(user);
 
 
                 // 生成融云token
-                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), user.getNickName(), user.getHeadImgUrl());
-                user.setRongCloudToken(tokenResult.getToken());
+                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), newUser.getNickName(), newUser.getHeadImgUrl());
+                newUser.setRongCloudToken(tokenResult.getToken());
 
                 return new ControllerResult().setRet_code(0)
                         .setRet_values(userService.insertUser(newUser));
             }
-            return new ControllerResult().setRet_code(1).setRet_values("")
+            return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap())
                     .setMessage("验证码错误");
         } else {
-            return new ControllerResult().setRet_code(1).setRet_values("")
+            return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap())
                     .setMessage("非法的验证码");
         }
     }
@@ -250,32 +251,32 @@ public class UserController {
             if (user == null) {
                 // 注册
                 if (StringUtils.isBlank(login.getNickName())) {
-                    user.setNickName(RandomStringUtils.randomNumeric(8));
+                    login.setNickName(RandomStringUtils.randomNumeric(8));
                 }
                 if (StringUtils.isBlank(login.getHeadImgUrl())) {
-                    user.setHeadImgUrl("https://pic.qqtn.com/up/2018-3/15223765997238966.jpg");
+                    login.setHeadImgUrl(userDefaultAvatarUrl);
                 }
                 login.setUserType(UserType.app);
                 User newUser = userService.insertUser(login);
                 // 生成融云token
-                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), user.getNickName(), user.getHeadImgUrl());
+                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), newUser.getNickName(), newUser.getHeadImgUrl());
                 newUser.setRongCloudToken(tokenResult.getToken());
                 return new ControllerResult().setRet_code(0).setRet_values(userService.insertUser(newUser)).setMessage("登陆成功");
             }
         } else {
             // 密码登陆
             if (StringUtils.isBlank(password)) {
-                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("密码不能为空");
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("密码不能为空");
             }
             if (StringUtils.isBlank(phone)) {
-                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能空");
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("手机号不能空");
             }
             user = userService.findByPhone(phone);
             if (user == null) {
-                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("用户不存在");
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("用户不存在");
             }
             if (!user.getPassword().equals(Md5Utlls.getMD5String(password))) {
-                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("密码错误");
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("密码错误");
             }
         }
         return new ControllerResult().setRet_code(0).setRet_values(user).setMessage("登陆成功");
@@ -294,7 +295,7 @@ public class UserController {
             thirdLogin.setNickName(RandomStringUtils.randomNumeric(8));
         }
         if (StringUtils.isBlank(thirdLogin.getHeadImgUrl())) {
-            thirdLogin.setHeadImgUrl("https://pic.qqtn.com/up/2018-3/15223765997238966.jpg");
+            thirdLogin.setHeadImgUrl(userDefaultAvatarUrl);
         }
         User user = userService.insertUser(thirdLogin);
         // 生成融云token
@@ -387,6 +388,12 @@ public class UserController {
     @ApiOperation(value = "关注用户")
     @RequestMapping(value = "followUser/{version}", method = RequestMethod.POST)
     public ControllerResult followUser(@RequestBody UserFollow userFollow, @PathVariable String version) {
+        if(userFollow.isStatus()){
+            UserFollow follow = userFollowService.existFollow(userFollow);
+            if (follow != null) {
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("已关注该用户");
+            }
+        }
         UserFollow userFollow1 = userFollowService.save(userFollow);
         return new ControllerResult().setRet_code(0).setRet_values(userFollow1).setMessage("");
     }
@@ -465,7 +472,7 @@ public class UserController {
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号未被注册");
         }
         if (!user.getPassword().equals(Md5Utlls.getMD5String(password))) {
-            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("密码错误");
+            return new ControllerResult().setRet_code(1).setRet_values(new JsonObject()).setMessage("密码错误");
         }
         Date date = new Date();
         DateTime dateTime = new DateTime(date);
