@@ -83,12 +83,13 @@ public class UserFollowService {
         if (fans != null && fans.size() > 0) {
             for (UserFollow u : fans) {
                 FansDto dto = new FansDto();
+                User user = userDao.findOne(u.getUserId());
                 dto.setCreateTime(u.getCreateTime());
-                dto.setHeadImgUrl(u.getHeadImgUrl());
-                dto.setFollowId(u.getUserId());
-                dto.setNickName(u.getNickName());
+                dto.setHeadImgUrl(user.getHeadImgUrl());
+                dto.setNickName(user.getNickName());
+                dto.setFollowId(user.getUserId());
                 //  判断你是否是该用户的粉丝
-                if (userFollows.contains(u.getFollowId())) {
+                if (userFollows.contains(user.getUserId())) {
                     dto.setFollow(true);
                 } else {
                     dto.setFollow(false);
