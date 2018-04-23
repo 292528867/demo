@@ -73,7 +73,7 @@ public class RechargeController {
         model.setSubject("支付宝充值");
         model.setOutTradeNo(newRecharge.getId());
         model.setTimeoutExpress("30m");
-        model.setTotalAmount("0.001");
+        model.setTotalAmount("0.01");
 //        model.setTotalAmount(newRecharge.getMoney() + "");
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setBizModel(model);

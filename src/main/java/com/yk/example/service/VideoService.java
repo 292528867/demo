@@ -7,10 +7,16 @@ import com.yk.example.utils.Distance;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,5 +156,26 @@ public class VideoService {
     @Transactional
     public void deleteVideo(VideoRecord videoRecord) {
         videoDao.updateFlag(videoRecord.getId(),"1");
+    }
+
+    public Page<VideoRecord> findAllPage(VideoRecord videoRecord, Pageable pageable) {
+        Specification<VideoRecord> specification = new Specification<VideoRecord>() {
+            @Override
+            public Predicate toPredicate(Root<VideoRecord> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //所有的断言
+                List<Predicate> predicates = new ArrayList<>();
+                if (StringUtils.isNoneBlank(videoRecord.getVideoUrl())) {
+                    predicates.add(criteriaBuilder.like(root.get("videoUrl").as(String.class), videoRecord.getVideoUrl() + "%"));
+                }
+                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class),"0"));
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+        return videoDao.findAll(specification, pageable);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void shieldVideo(String id) {
+        videoDao.updateFlag(id,"2");
     }
 }

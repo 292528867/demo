@@ -20,7 +20,7 @@
         <div class="border-bottom" th:include="header :: headerTop"></div>
         <div class="row wrapper border-bottom white-bg page-heading" th:fragment="headerNav">
             <div class="col-lg-10">
-                <h2>用户提现管理</h2>
+                <h2>用户管理</h2>
             </div>
             <div class="col-lg-2">
             </div>
@@ -38,16 +38,14 @@
                             </div>
                         </div>
                         <div class="ibox-content" style="display: block;">
-                            <form action="userList_0_0_0">
+                            <form action="videoList_0_0_0">
                                 <div class="row">
                                     <div class="col-sm-3 m-b-xs">
-                                        <input name="nickName" value=""  placeholder="支付宝账号姓名"
+                                        <input name="videoUrl" value="" th:value="${video.videoUrl}"
+                                               placeholder="阿里云的视频id"
                                                class="form-control" type="text"/>
                                     </div>
-                                    <div class="col-sm-3 m-b-xs">
-                                        <input name="phone" value=""  placeholder="用户支付宝账号"
-                                               class="form-control" type="text"/>
-                                    </div>
+
                                     <div class="col-sm-1 m-b-xs">
                                         <button id="submitButton" class="btn btn-primary btn-block" type="submit"><i
                                                 class="fa fa-search"></i><strong>搜索</strong>
@@ -55,14 +53,21 @@
                                     </div>
                                 </div>
                             </form>
-
+                            <div class="row">
+                                <div class="col-sm-6 m-b-xs">
+                                    <!--<a th:href="@{tagEdit}" class="btn btn-white btn-sm" data-toggle="tooltip"
+                                       data-placement="left" title="" data-original-title="Refresh inbox"><i
+                                            class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;新增视频&nbsp;&nbsp;&nbsp;&nbsp;</a>-->
+                                </div>
+                                <div class="col-sm-6 m-b-xs"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-12">
                     <div class="ibox float-e-margins">
                         <div class="ibox-title">
-                            <h5>用户提现列表</h5>
+                            <h5>视频列表</h5>
                             <div class="ibox-tools">
                                 <a class="collapse-link">
                                     <i class="fa fa-chevron-up"></i>
@@ -75,21 +80,28 @@
                                 <table class=" table table-hover" data-page-size="10">
                                     <thead>
                                     <tr>
-                                        <th width="20%">用户昵称</th>
-                                        <th width="20%">提现金额</th>
-                                        <th width="30%">支付宝账号</th>
-                                        <th width="30%">支付宝名称</th>
+                                        <th width="20%">视频名称</th>
+                                        <th width="10%">阿里云的视频id</th>
+                                        <th width="5%">点赞数</th>
+                                        <th width="5%">评论数</th>
+                                        <th width="10%">创建用户手机号</th>
+                                        <th width="10%">视频分类</th>
+                                        <th width="20%">创建时间</th>
                                         <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr th:each="nc : ${userCashList}">
-                                        <td th:text="${nc.user.userId}"></td>
-                                        <td th:text="${nc.money}"></td>
-                                        <td th:text="${nc.zfbAccount}"></td>
-                                        <td th:text="${nc.zfbAccountName}"></td>
+                                    <tr th:each="nc : ${videoList}">
+                                        <td th:text="${nc.title}"></td>
+                                        <td th:text="${nc.videoUrl}"></td>
+                                        <td th:text="${nc.zanNum}"></td>
+                                        <td th:text="${nc.commentNum}"></td>
+                                        <td th:text="${nc.user.phone}"></td>
+                                        <td th:text="${nc.tag.name}"></td>
+                                        <td th:text="${#dates.format(nc.createTime, 'yyyy-MM-dd')}"></td>
                                         <td>
-
+                                            <a href="#" th:onclick="'javascript:shieldVideo(\''+${nc.id}+'\')'" title="屏蔽"><i
+                                                    class="fa fa-edit text-navy"></i></a>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -147,12 +159,11 @@
 
     });
 
-    function updateState(userId, isValid) {
-        console.log("111111111");
-        if (confirm("确定删除此条信息?")) {
+    function shieldVideo(id) {
+        if (confirm("确定屏蔽该视频?")) {
             $.ajax({
                 type: "POST",
-                url: "updateUserState?userId=" + userId + "&isValid=" + isValid,
+                url: "shieldVideo?id=" + id,
                 contentType: "application/json; charset=utf-8",
                 success: function (msg) {
                     window.location.reload();
