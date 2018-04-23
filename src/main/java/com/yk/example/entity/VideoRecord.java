@@ -1,5 +1,6 @@
 package com.yk.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yk.example.enums.ViewAuth;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @ApiModel(value = "视频实体", description = "视频对象")
 @Entity
 @Table(name = "t_video_record")
+@JsonIgnoreProperties({"flag"})
 public class VideoRecord extends BaseEntity {
 
     @ApiModelProperty(value = "视频标题", name = "title")
@@ -65,6 +67,8 @@ public class VideoRecord extends BaseEntity {
     @Column(name = "viewAuth", columnDefinition = " varchar(2) comment '查看权限 0 所有人可查看 1 好友查看 2 仅自己查看' ")
     private ViewAuth viewAuth;
 
+    @Column(name = "flag", columnDefinition = " varchar(2) comment '删除标志 0 已发布 1 用户删除 2 运营屏蔽' ")
+    private String flag;
 
     // 用户是否关注
     @ApiModelProperty(value = "用户是否关注", name = "status")
@@ -216,5 +220,11 @@ public class VideoRecord extends BaseEntity {
         this.videoImgUrl = videoImgUrl;
     }
 
+    public String getFlag() {
+        return flag;
+    }
 
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
 }

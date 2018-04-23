@@ -80,9 +80,9 @@ public class VideoService {
         if (StringUtils.isNotBlank(userId)) {
             User user = new User();
             user.setUserId(userId);
-            videoRecords =  videoDao.findTop10ByUserNot(user);
+            videoRecords =  videoDao.findTop10ByUserNotAndFlag(user,"0" );
         } else {
-            videoRecords  = videoDao.findTop10By();
+            videoRecords  = videoDao.findTop10ByAndFlag("0");
         }
         return videoRecords;
     }
@@ -116,23 +116,25 @@ public class VideoService {
     }
 
     public Page<VideoRecord> findByUser(String userId, Pageable pageable) {
-        Page<VideoRecord> videoRecords = videoDao.findByUser(userDao.findOne(userId), pageable);
+        Page<VideoRecord> videoRecords = videoDao.findByUserAndFlag(userDao.findOne(userId), pageable,"0");
         return videoRecords;
     }
 
     public VideoRecord save(VideoRecord videoRecord) {
+        // 发布短视频
+        videoRecord.setFlag("0");
         return videoDao.save(videoRecord);
     }
 
     public long countByUserId(String userId) {
-        return videoDao.countByUser(userDao.findOne(userId));
+        return videoDao.countByUserAndFlag(userDao.findOne(userId), "0");
     }
 
     public Page<VideoRecord> findByTag(String tagName, Pageable pageable) {
         List<VideoTag> tags = videoTagDao.findByNameLike(tagName);
         Page<VideoRecord> videoRecords = null;
         if (tags != null && tags.size() > 0) {
-            videoRecords = videoDao.findByTagIn(tags, pageable);
+            videoRecords = videoDao.findByTagInAndFlag(tags, pageable,"0" );
         }
         return videoRecords;
     }
@@ -147,6 +149,6 @@ public class VideoService {
 
     @Transactional
     public void deleteVideo(VideoRecord videoRecord) {
-        videoDao.delete(videoRecord.getId());
+        videoDao.updateFlag(videoRecord.getId(),"1");
     }
 }

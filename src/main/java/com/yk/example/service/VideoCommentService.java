@@ -5,17 +5,12 @@ import com.yk.example.dao.VideoDao;
 import com.yk.example.entity.User;
 import com.yk.example.entity.VideoComment;
 import com.yk.example.entity.VideoRecord;
-import com.yk.example.utils.JPushUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,7 +47,7 @@ public class VideoCommentService {
     public Page<VideoComment> findAllCommentByUser(String userId, Pageable pageable) {
         User user = new User();
         user.setUserId(userId);
-        List<VideoRecord> videoRecords = videoDao.findByUser(user);
+        List<VideoRecord> videoRecords = videoDao.findByUserAndFlag(user, "0");
         Page<VideoComment> page = videoCommentDao.findByVideoRecordIn(videoRecords,pageable);
         return page;
     }
