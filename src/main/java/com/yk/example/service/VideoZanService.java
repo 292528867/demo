@@ -64,10 +64,10 @@ public class VideoZanService {
         zanRecordHistory.setHeadImgUrl(user.getHeadImgUrl());
         zanRecordHistoryDao.save(zanRecordHistory);
         // 对被点赞人进行推送
-       /* if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
+        if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
             JPushUtils.sendAlias(user.getNickName() + "在" + new DateTime(new Date()).toString("yyyy-MM-dd hh:mm") + "点赞您的视频",
                     Collections.singletonList(videoRecord.getUser().getUserId()),Collections.singletonMap("videoId",videoRecord.getId()));
-        }*/
+        }
         return zan;
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecificationExecutor {
 
     @Query(" from  VideoRecord vr where vr.user.userId = ?1 and vr.createTime = " +
-            " ( select max(v.createTime) from VideoRecord  v where v.user.userId = ?1 and v.flag = '0' )")
+            " ( select max(v.createTime) from VideoRecord  v where v.user.userId = ?1 and v.flag = '1' )")
     VideoRecord findLastVideoByUser(String userId);
 
     @Modifying
@@ -49,4 +49,8 @@ public interface VideoDao extends CrudRepository<VideoRecord, String>, JpaSpecif
     @Query(" update VideoRecord vr set vr.flag =?2 where id =?1")
     @Modifying
     void updateFlag(String id,String flag);
+
+    List<VideoRecord> findByUserNotAndFlag(User user, String s);
+
+    List<VideoRecord> findByFlag(String s);
 }

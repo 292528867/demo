@@ -18,6 +18,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -86,11 +87,13 @@ public class VideoService {
         if (StringUtils.isNotBlank(userId)) {
             User user = new User();
             user.setUserId(userId);
-            videoRecords =  videoDao.findTop10ByUserNotAndFlag(user,"0" );
+            videoRecords =  videoDao.findByUserNotAndFlag(user,"1" );
+            Collections.shuffle(videoRecords);
         } else {
-            videoRecords  = videoDao.findTop10ByAndFlag("0");
+            videoRecords  = videoDao.findByFlag("1");
+            Collections.shuffle(videoRecords);
         }
-        return videoRecords;
+        return videoRecords.size() > 10 ? videoRecords.subList(0,9) : videoRecords.subList(0,videoRecords.size());
     }
 
     public VideoRecord findOne(String videoId, String userId) {
@@ -122,7 +125,7 @@ public class VideoService {
     }
 
     public Page<VideoRecord> findByUser(String userId, Pageable pageable) {
-        Page<VideoRecord> videoRecords = videoDao.findByUserAndFlag(userDao.findOne(userId), pageable,"0");
+        Page<VideoRecord> videoRecords = videoDao.findByUserAndFlag(userDao.findOne(userId), pageable,"1");
         return videoRecords;
     }
 
@@ -133,14 +136,14 @@ public class VideoService {
     }
 
     public long countByUserId(String userId) {
-        return videoDao.countByUserAndFlag(userDao.findOne(userId), "0");
+        return videoDao.countByUserAndFlag(userDao.findOne(userId), "1");
     }
 
     public Page<VideoRecord> findByTag(String tagName, Pageable pageable) {
         List<VideoTag> tags = videoTagDao.findByNameLike(tagName);
         Page<VideoRecord> videoRecords = null;
         if (tags != null && tags.size() > 0) {
-            videoRecords = videoDao.findByTagInAndFlag(tags, pageable,"0" );
+            videoRecords = videoDao.findByTagInAndFlag(tags, pageable,"1" );
         }
         return videoRecords;
     }
@@ -155,7 +158,7 @@ public class VideoService {
 
     @Transactional
     public void deleteVideo(VideoRecord videoRecord) {
-        videoDao.updateFlag(videoRecord.getId(),"1");
+        videoDao.updateFlag(videoRecord.getId(),"3");
     }
 
     public Page<VideoRecord> findAllPage(VideoRecord videoRecord, Pageable pageable) {
@@ -175,7 +178,7 @@ public class VideoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void shieldVideo(String id) {
-        videoDao.updateFlag(id,"2");
+    public void agreeOrShieldVideo(String id,String flag) {
+        videoDao.updateFlag(id,flag);
     }
 }

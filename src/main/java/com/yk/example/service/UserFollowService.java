@@ -69,7 +69,8 @@ public class UserFollowService {
             userFollowDao.deleteByUserIdAndFollowId(userFollow.getUserId(),userFollow.getFollowId());
         }
         // 对follow用户进行推送
-//        JPushUtils.sendAlias(user.getNickName() + new DateTime(new Date()).toString("yyyy-MM-dd") + "关注了您", Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
+        JPushUtils.sendAlias(user.getNickName() + new DateTime(new Date()).toString("yyyy-MM-dd") + "关注了您",
+                Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
         return userFollow;
     }
 

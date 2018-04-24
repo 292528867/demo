@@ -20,7 +20,7 @@
         <div class="border-bottom" th:include="header :: headerTop"></div>
         <div class="row wrapper border-bottom white-bg page-heading" th:fragment="headerNav">
             <div class="col-lg-10">
-                <h2>用户管理</h2>
+                <h2>app版本管理</h2>
             </div>
             <div class="col-lg-2">
             </div>
@@ -38,26 +38,26 @@
                             </div>
                         </div>
                         <div class="ibox-content" style="display: block;">
-                            <form action="videoList_0_0_0">
+                            <form action="versionList_0_0_0">
                                 <div class="row">
                                     <div class="col-sm-3 m-b-xs">
-                                        <input name="videoUrl" value="" th:value="${video.videoUrl}"
+                                       <!-- <input name="videoUrl" value="" th:value="${video.videoUrl}"
                                                placeholder="阿里云的视频id"
-                                               class="form-control" type="text"/>
+                                               class="form-control" type="text"/>-->
                                     </div>
 
                                     <div class="col-sm-1 m-b-xs">
-                                        <button id="submitButton" class="btn btn-primary btn-block" type="submit"><i
+                                       <!-- <button id="submitButton" class="btn btn-primary btn-block" type="submit"><i
                                                 class="fa fa-search"></i><strong>搜索</strong>
-                                        </button>
+                                        </button>-->
                                     </div>
                                 </div>
                             </form>
                             <div class="row">
                                 <div class="col-sm-6 m-b-xs">
-                                    <!--<a th:href="@{tagEdit}" class="btn btn-white btn-sm" data-toggle="tooltip"
+                                    <a th:href="@{versionEdit}" class="btn btn-white btn-sm" data-toggle="tooltip"
                                        data-placement="left" title="" data-original-title="Refresh inbox"><i
-                                            class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;新增视频&nbsp;&nbsp;&nbsp;&nbsp;</a>-->
+                                            class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;版本发布&nbsp;&nbsp;&nbsp;&nbsp;</a>
                                 </div>
                                 <div class="col-sm-6 m-b-xs"></div>
                             </div>
@@ -67,7 +67,7 @@
                 <div class="col-lg-12">
                     <div class="ibox float-e-margins">
                         <div class="ibox-title">
-                            <h5>视频列表</h5>
+                            <h5>版本管理列表</h5>
                             <div class="ibox-tools">
                                 <a class="collapse-link">
                                     <i class="fa fa-chevron-up"></i>
@@ -80,40 +80,18 @@
                                 <table class=" table table-hover" data-page-size="10">
                                     <thead>
                                     <tr>
-                                        <th width="20%">视频名称</th>
-                                        <th width="10%">阿里云的视频id</th>
-                                        <th width="5%">点赞数</th>
-                                        <th width="5%">评论数</th>
-                                        <th width="10%">创建用户手机号</th>
-                                        <th width="10%">视频分类</th>
-                                        <th width="20%">创建时间</th>
-<!--
-                                        <th width="20%">视频状态</th>
--->
-                                        <th>操作</th>
+                                        <th width="20%">版本名称</th>
+                                        <th width="10%">版本更新内容</th>
+                                        <th width="5%">版本号</th>
+                                        <th width="5%">版本下载地址</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr th:each="nc : ${videoList}">
-                                        <td th:text="${nc.title}"></td>
-                                        <td th:text="${nc.videoUrl}"></td>
-                                        <td th:text="${nc.zanNum}"></td>
-                                        <td th:text="${nc.commentNum}"></td>
-                                        <td th:text="${nc.user.phone}"></td>
-                                        <td th:text="${nc.tag.name}"></td>
-                                        <td th:text="${#dates.format(nc.createTime, 'yyyy-MM-dd')}"></td>
-                                 <!--       <td th:switch="${nc.flag}">
-                                            <p th:case="'0'">待审核</p>
-                                            <p th:case="'qq'">审核通过</p>
-                                            <p th:case="'app'">被屏蔽</p>
-                                            <p th:case="'wb'">用户删除</p>
-                                        </td>-->
-                                        <td>
-                                            <a href="#" th:onclick="'javascript:shieldVideo(\''+${nc.id}+'\',\'1\')'" title="审核通过"><i
-                                                    class="fa fa-edit text-navy"></i></a>
-                                            <a href="#" th:onclick="'javascript:shieldVideo(\''+${nc.id}+'\',\'2\')'" title="屏蔽"><i
-                                                    class="fa fa-trash-o text-navy"></i></a>
-                                        </td>
+                                    <tr th:each="nc : ${versionList}">
+                                        <td th:text="${nc.apkName}"></td>
+                                        <td th:text="${nc.updateContent}"></td>
+                                        <td th:text="${nc.version}"></td>
+                                        <td th:text="${nc.downUrl}"></td>
                                     </tr>
                                     </tbody>
                                     <tfoot>

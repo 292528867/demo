@@ -2,7 +2,6 @@ package com.yk.example.manage;
 
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.entity.VideoRecord;
-import com.yk.example.entity.VideoTag;
 import com.yk.example.service.VideoService;
 import com.yk.example.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +48,14 @@ public class VideoManageController {
     }
 
     /**
-     *  屏蔽视频
+     *  通过或屏蔽视频
      * @param videoRecord
      * @return
      */
-    @RequestMapping(value = "/admin/shieldVideo", method = RequestMethod.POST)
+    @RequestMapping(value = "/admin/agreeOrShieldVideo", method = RequestMethod.POST)
     @ResponseBody
-    public ControllerResult shieldVideo(VideoRecord videoRecord){
-        videoService.shieldVideo(videoRecord.getId());
+    public ControllerResult agreeOrShieldVideo(VideoRecord videoRecord){
+        videoService.agreeOrShieldVideo(videoRecord.getId(),videoRecord.getFlag());
         return new ControllerResult().setRet_code(0).setMessage("屏蔽成功");
     }
 }
