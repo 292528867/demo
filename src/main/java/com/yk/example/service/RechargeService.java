@@ -63,7 +63,7 @@ public class RechargeService {
                 billDetail.setUser(recommendUser);
                 billDetailDao.save(billDetail);
                 // 如果推荐人还有推荐人 则奖励10元
-                String spaceRecommendUserId = recommendUser.getDirectRecommendUser();
+       /*         String spaceRecommendUserId = recommendUser.getDirectRecommendUser();
                 if(StringUtils.isNotBlank(spaceRecommendUserId)){
                     User spaceRecommendUser = userDao.findOne(spaceRecommendUserId);
                     UserInfo spaceRecommendUserInfo = userInfoDao.findByUser(spaceRecommendUser);
@@ -76,7 +76,7 @@ public class RechargeService {
                     billDetail1.setMoney(10);
                     billDetail1.setUser(spaceRecommendUser);
                     billDetailDao.save(billDetail1);
-                }
+                }*/
             }
         }
         // 修改用户秒豆 并生成账单

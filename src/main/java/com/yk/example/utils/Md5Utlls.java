@@ -105,11 +105,11 @@ public class Md5Utlls {
     /**
      * 生成邀请码
      *
-     * @param uuid
+     * @param
      * @return
      */
     public static String generateInviteCode() {
-        return RandomStringUtils.randomNumeric(6);
+        return getCharAndNumr(6);
     }
 
 
@@ -125,6 +125,7 @@ public class Md5Utlls {
                 //取得大写字母还是小写字母
                 int choice = random.nextInt(2) % 2 == 0 ? 65 : 97;
                 val += (char) (choice + random.nextInt(26));
+                val = val.toLowerCase();
             }
             // 数字
             else if ("num".equalsIgnoreCase(charOrNum)) {

@@ -2,8 +2,12 @@ package com.yk.example.utils;
 
 
 import com.yk.example.rongCloud.RongCloud;
+import com.yk.example.rongCloud.messages.TxtMessage;
+import com.yk.example.rongCloud.methods.message._private.Private;
 import com.yk.example.rongCloud.methods.user.User;
 import com.yk.example.rongCloud.models.Result;
+import com.yk.example.rongCloud.models.message.PrivateMessage;
+import com.yk.example.rongCloud.models.response.ResponseResult;
 import com.yk.example.rongCloud.models.response.TokenResult;
 import com.yk.example.rongCloud.models.user.UserModel;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +24,7 @@ public class RongCloudUtils {
 
     private static final String APP_KEY;
     private static final String APP_SECRET;
+    private static final RongCloud rongCloud;
 
 
     static {
@@ -31,6 +36,8 @@ public class RongCloudUtils {
             props.load(stream);
             APP_KEY = props.getProperty("rongCloud.app_key");
             APP_SECRET = props.getProperty("rongCloud.app_secret");
+            rongCloud = RongCloud.getInstance(APP_KEY, APP_SECRET);
+
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             throw new RuntimeException(e);
@@ -46,14 +53,7 @@ public class RongCloudUtils {
      * @return
      */
     public static TokenResult registerRongCloudUser(String userId, String nickName, String headImgUrl){
-        RongCloud rongCloud = RongCloud.getInstance(APP_KEY, APP_SECRET);
         User rongCloudUser = rongCloud.user;
-        if(!StringUtils.isNotBlank(nickName)){
-            nickName = "test";
-        }if(!StringUtils.isNotBlank(headImgUrl)){
-            headImgUrl = "https://pic.qqtn.com/up/2018-3/15223765997238966.jpg";
-        }
-
         UserModel user = new UserModel()
                 .setId(userId)
                 .setName(nickName)
@@ -74,7 +74,6 @@ public class RongCloudUtils {
      * @return
      */
     public static Result refreshRongCloudUser(String userId, String nickName, String headImgUrl){
-        RongCloud rongCloud = RongCloud.getInstance(APP_KEY, APP_SECRET);
         User rongCloudUser = rongCloud.user;
         UserModel user = new UserModel()
                 .setId(userId)
@@ -87,5 +86,22 @@ public class RongCloudUtils {
         }
         return null;
     }
+
+    public static ResponseResult sendPrivateMessage(String fromUserId,String toUserId,String content){
+        Private msgPrivate = rongCloud.message.msgPrivate;
+        PrivateMessage message = new PrivateMessage()
+                .setSenderUserId(fromUserId)
+                .setTargetId(new String[]{toUserId})
+                .setObjectName("RC:TxtMsg")
+                .setContent(new TxtMessage(content, ""));
+        try {
+            return msgPrivate.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
 }
