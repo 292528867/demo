@@ -1,13 +1,13 @@
 package com.yk.example.entity;
 
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * 聊天记录
  * Created by yk on 2018/4/25.
  */
+@Entity
+@Table(name = "t_message")
 public class Message extends BaseEntity {
 
     @ManyToOne()

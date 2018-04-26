@@ -125,8 +125,13 @@ public class VideoController {
     @RequestMapping(value = "videoZan/{version}", method = RequestMethod.POST)
     public ControllerResult videoZan(@RequestBody VideoZan videoZan, @PathVariable String version) {
         if (StringUtils.isNotBlank(videoZan.getUser().getUserId())) {
-            videoZanService.save(videoZan);
-            return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+            VideoZan newZan = videoZanService.findByUserAndVideo(videoZan);
+            if (newZan == null) {
+                videoZanService.save(videoZan);
+                return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
+            } else {
+                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("已经对该视频点赞过");
+            }
         }
         return new ControllerResult().setRet_code(99).setRet_values("").setMessage("请先登录");
     }
@@ -224,16 +229,17 @@ public class VideoController {
     }
 
     /**
-     *  删除用户的视频
+     * 删除用户的视频
+     *
      * @param version
      * @param videoRecord
      * @return
      */
     @ApiOperation(value = "删除用户的视频")
     @RequestMapping(value = "deleteVideo/{version}", method = RequestMethod.POST)
-    public ControllerResult deleteVideo( @PathVariable String version, @RequestBody VideoRecord videoRecord){
-       boolean existVideo =   videoService.existVideo(videoRecord);
-        if(existVideo){
+    public ControllerResult deleteVideo(@PathVariable String version, @RequestBody VideoRecord videoRecord) {
+        boolean existVideo = videoService.existVideo(videoRecord);
+        if (existVideo) {
             videoService.deleteVideo(videoRecord);
             return new ControllerResult().setRet_code(1).setRet_values("").setMessage("");
         }

@@ -1,13 +1,7 @@
 package com.yk.example.service;
 
-import com.yk.example.dao.UserDao;
-import com.yk.example.dao.VideoDao;
-import com.yk.example.dao.VideoZanDao;
-import com.yk.example.dao.ZanRecordHistoryDao;
-import com.yk.example.entity.User;
-import com.yk.example.entity.VideoRecord;
-import com.yk.example.entity.VideoZan;
-import com.yk.example.entity.ZanRecordHistory;
+import com.yk.example.dao.*;
+import com.yk.example.entity.*;
 import com.yk.example.enums.ZanStatus;
 import com.yk.example.enums.ZanType;
 import com.yk.example.utils.JPushUtils;
@@ -37,18 +31,27 @@ public class VideoZanService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private UserInfoDao userInfoDao;
+
     @Transactional(rollbackFor = Exception.class)
     public VideoZan save(VideoZan videoZan) {
         VideoZan zan = videoZanDao.save(videoZan);
         String videoId = videoZan.getVideoRecord().getId();
         VideoRecord videoRecord = videoDao.findOne(videoId);
+        UserInfo userInfo = userInfoDao.findByUser(videoZan.getUser());
         int zanNum = videoRecord.getZanNum();
+        long userZanNum = userInfo.getZanNum();
         if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
             zanNum += 1;
+            userZanNum += 1;
         } else {
             zanNum -= 1;
+            userZanNum += 1;
         }
         videoDao.updateZanNum(zanNum, videoId);
+        userInfo.setZanNum(userZanNum);
+        userInfoDao.save(userInfo);
         // 保存点赞记录
         ZanRecordHistory zanRecordHistory = new ZanRecordHistory();
         zanRecordHistory.setZanType(ZanType.video);
@@ -66,8 +69,12 @@ public class VideoZanService {
         // 对被点赞人进行推送
         if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
             JPushUtils.sendAlias(user.getNickName() + "在" + new DateTime(new Date()).toString("yyyy-MM-dd hh:mm") + "点赞您的视频",
-                    Collections.singletonList(videoRecord.getUser().getUserId()),Collections.singletonMap("videoId",videoRecord.getId()));
+                    Collections.singletonList(videoRecord.getUser().getUserId()), Collections.singletonMap("videoId", videoRecord.getId()));
         }
         return zan;
+    }
+
+    public VideoZan findByUserAndVideo(VideoZan videoZan) {
+        return videoZanDao.findByUserAndVideoRecord(videoZan.getUser(),videoZan.getVideoRecord());
     }
 }
