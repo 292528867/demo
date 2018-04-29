@@ -17,7 +17,7 @@ public class ZanRecordHistoryService {
     private ZanRecordHistoryDao zanRecordHistoryDao;
 
     public List<ZanRecordHistory> zanList(String userId) {
-        return zanRecordHistoryDao.findByFromUserId(userId);
+        return zanRecordHistoryDao.findByToUserId(userId);
     }
 }
 

@@ -83,9 +83,15 @@ public class VideoController {
      */
     @ApiOperation(value = "推荐的视频")
     @RequestMapping(value = "recommend/{version}", method = RequestMethod.GET)
-    public ControllerResult recommend(String userId, @PathVariable String version) {
-        List<VideoRecord> videoRecords = videoService.recommend(userId);
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
+    public ControllerResult recommend(String userId, @PathVariable String version,String page ,String size) {
+       if("1".equals(version)){
+           List<VideoRecord> videoRecords = videoService.recommend(userId);
+           return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
+       }else if("2".equals(version)){
+           Page<VideoRecord> videoRecordPage = videoService.recommend(userId, new PageRequest(Integer.parseInt(page), Integer.parseInt(size)));
+           return new ControllerResult().setRet_code(0).setRet_values(videoRecordPage).setMessage("");
+       }
+        return null;
     }
 
     /**

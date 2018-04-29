@@ -39,7 +39,8 @@ public class VideoZanService {
         VideoZan zan = videoZanDao.save(videoZan);
         String videoId = videoZan.getVideoRecord().getId();
         VideoRecord videoRecord = videoDao.findOne(videoId);
-        UserInfo userInfo = userInfoDao.findByUser(videoZan.getUser());
+        // 被点赞人信息
+        UserInfo userInfo = userInfoDao.findByUser(videoRecord.getUser());
         int zanNum = videoRecord.getZanNum();
         long userZanNum = userInfo.getZanNum();
         if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
@@ -47,7 +48,7 @@ public class VideoZanService {
             userZanNum += 1;
         } else {
             zanNum -= 1;
-            userZanNum += 1;
+            userZanNum -= 1;
         }
         videoDao.updateZanNum(zanNum, videoId);
         userInfo.setZanNum(userZanNum);

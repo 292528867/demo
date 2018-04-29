@@ -93,7 +93,25 @@ public class VideoService {
             videoRecords  = videoDao.findByFlag("1");
             Collections.shuffle(videoRecords);
         }
-        return videoRecords.size() > 10 ? videoRecords.subList(0,9) : videoRecords.subList(0,videoRecords.size());
+        return videoRecords.size() > 10 ? videoRecords.subList(0,10) : videoRecords.subList(0,videoRecords.size());
+    }
+
+    public Page<VideoRecord> recommend(String userId,Pageable pageable){
+        Specification<VideoRecord> specification = new Specification<VideoRecord>() {
+            @Override
+            public Predicate toPredicate(Root<VideoRecord> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //所有的断言
+                List<Predicate> predicates = new ArrayList<>();
+                if(StringUtils.isNotBlank(userId)){
+                    User user = new User();
+                    user.setUserId(userId);
+                    predicates.add(criteriaBuilder.notEqual(root.get("user").as(User.class),user));
+                }
+                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class),"1"));
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+        return videoDao.findAll(specification, pageable);
     }
 
     public VideoRecord findOne(String videoId, String userId) {
