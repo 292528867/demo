@@ -8,10 +8,7 @@ import com.yk.example.utils.Distance;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,7 +116,27 @@ public class VideoService {
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
-        return videoDao.findAll(specification, pageable);
+        Page<VideoRecord> recordPage = videoDao.findAll(specification, pageable);
+        // 判断是否关注
+        List<VideoRecord> records = recordPage.getContent();
+        if (StringUtils.isNoneBlank(userId)) {
+            List<String> followUser = userFollowDao.findByUserId(userId, true);
+            if (followUser != null && followUser.size() > 0) {
+                for (VideoRecord videoRecord : records) {
+                    boolean flag = false;
+                    for (String followUserId : followUser) {
+                        if (videoRecord.getUser().getUserId().equals(followUserId)) {
+                            videoRecord.setFollow(true);
+                            flag = true;
+                        }
+                    }
+                    if(!flag){
+                       videoRecord.setFollow(false);
+                    }
+                }
+            }
+        }
+        return  new PageImpl(records, pageable, recordPage.getTotalElements());
     }
 
     public VideoRecord findOne(String videoId, String userId) {
@@ -225,7 +242,7 @@ public class VideoService {
                     VideoRecord videoRecord = new VideoRecord();
                     videoRecord.setVideoUrl(cellList.get(0));
                     videoRecord.setTitle(cellList.get(1));
-                    videoRecord.setVideoImgUrl(videoUrl+"/"+cellList.get(0)+".jpg");
+                    videoRecord.setVideoImgUrl(videoUrl + "/" + cellList.get(0) + ".jpg");
                     videoRecord.setMusicName(cellList.get(3));
                     videoRecord.setUser(userDao.findByPhone(cellList.get(4)));
                     videoRecord.setLatitude("121.508269");
