@@ -32,6 +32,16 @@ public class UserInfoDto implements Serializable {
 
     private float miaoPeas;
 
+    private boolean vip;
+
+    public boolean isVip() {
+        return vip;
+    }
+
+    public void setVip(boolean vip) {
+        this.vip = vip;
+    }
+
     public float getAccountIncome() {
         return accountIncome;
     }

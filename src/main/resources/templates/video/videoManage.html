@@ -55,9 +55,9 @@
                             </form>
                             <div class="row">
                                 <div class="col-sm-6 m-b-xs">
-                                    <!--<a th:href="@{tagEdit}" class="btn btn-white btn-sm" data-toggle="tooltip"
+                                    <a th:href="@{toVideoImport}" class="btn btn-white btn-sm" data-toggle="tooltip"
                                        data-placement="left" title="" data-original-title="Refresh inbox"><i
-                                            class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;新增视频&nbsp;&nbsp;&nbsp;&nbsp;</a>-->
+                                            class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;导入视频&nbsp;&nbsp;&nbsp;&nbsp;</a>
                                 </div>
                                 <div class="col-sm-6 m-b-xs"></div>
                             </div>
@@ -96,7 +96,7 @@
                                     <tbody>
                                     <tr th:each="nc : ${videoList}">
                                         <td th:text="${nc.title}"></td>
-                                        <td th:text="${nc.videoUrl}"></td>
+                                        <td ><img th:src="${nc.videoImgUrl}"  width="30%"></td>
                                         <td th:text="${nc.zanNum}"></td>
                                         <td th:text="${nc.commentNum}"></td>
                                         <td th:text="${nc.user.phone}"></td>

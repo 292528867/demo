@@ -2,13 +2,16 @@ package com.yk.example.service;
 
 import com.yk.example.dao.*;
 import com.yk.example.entity.*;
+import com.yk.example.enums.ViewAuth;
 import com.yk.example.enums.ZanStatus;
 import com.yk.example.utils.Distance;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +51,9 @@ public class VideoService {
     @Autowired
     private VideoTagDao videoTagDao;
 
+    @Value("${video.url}")
+    private String videoUrl;
+
 
     public List<VideoRecord> nearby(double longitude, double latitude, int page, int size) {
         //先计算查询点的经纬度范围
@@ -70,9 +76,10 @@ public class VideoService {
         if (userInfos != null && userInfos.size() > 0) {
             for (UserInfo userInfo : userInfos) {
                 // 查询用户的最后一个视频
-                VideoRecord videoRecord = videoDao.findLastVideoByUser(userInfo.getUser().getUserId());
-                if(videoRecord != null){
-                    videoRecord.setDistance(Distance.getDistance(latitude,longitude,userInfo.getLastLatitude(),userInfo.getLastLongitude()));
+                List<VideoRecord> videoRecordList = videoDao.findLastVideoByUser(userInfo.getUser().getUserId());
+                if (videoRecordList != null && videoRecordList.size() > 0) {
+                    VideoRecord videoRecord = videoRecordList.get(0);
+                    videoRecord.setDistance(Distance.getDistance(latitude, longitude, userInfo.getLastLatitude(), userInfo.getLastLongitude()));
                     videoRecords.add(videoRecord);
                 }
             }
@@ -87,27 +94,28 @@ public class VideoService {
         if (StringUtils.isNotBlank(userId)) {
             User user = new User();
             user.setUserId(userId);
-            videoRecords =  videoDao.findByUserNotAndFlag(user,"1" );
+            videoRecords = videoDao.findByUserNotAndFlag(user, "1");
             Collections.shuffle(videoRecords);
         } else {
-            videoRecords  = videoDao.findByFlag("1");
+            videoRecords = videoDao.findByFlag("1");
             Collections.shuffle(videoRecords);
         }
-        return videoRecords.size() > 10 ? videoRecords.subList(0,10) : videoRecords.subList(0,videoRecords.size());
+        return videoRecords.size() > 10 ? videoRecords.subList(0, 10) : videoRecords.subList(0, videoRecords.size());
     }
 
-    public Page<VideoRecord> recommend(String userId,Pageable pageable){
+    public Page<VideoRecord> recommend(String userId, Pageable pageable) {
         Specification<VideoRecord> specification = new Specification<VideoRecord>() {
             @Override
             public Predicate toPredicate(Root<VideoRecord> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 //所有的断言
                 List<Predicate> predicates = new ArrayList<>();
-                if(StringUtils.isNotBlank(userId)){
+                if (StringUtils.isNotBlank(userId)) {
                     User user = new User();
                     user.setUserId(userId);
-                    predicates.add(criteriaBuilder.notEqual(root.get("user").as(User.class),user));
+                    predicates.add(criteriaBuilder.notEqual(root.get("user").as(User.class), user));
                 }
-                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class),"1"));
+                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class), "1"));
+                criteriaQuery.orderBy(criteriaBuilder.desc(root.get("createTime")));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
@@ -143,13 +151,13 @@ public class VideoService {
     }
 
     public Page<VideoRecord> findByUser(String userId, Pageable pageable) {
-        Page<VideoRecord> videoRecords = videoDao.findByUserAndFlag(userDao.findOne(userId), pageable,"1");
+        Page<VideoRecord> videoRecords = videoDao.findByUserAndFlag(userDao.findOne(userId), pageable, "1");
         return videoRecords;
     }
 
     public VideoRecord save(VideoRecord videoRecord) {
         // 发布短视频
-        videoRecord.setFlag("0");
+        videoRecord.setFlag("1");
         return videoDao.save(videoRecord);
     }
 
@@ -161,14 +169,14 @@ public class VideoService {
         List<VideoTag> tags = videoTagDao.findByNameLike(tagName);
         Page<VideoRecord> videoRecords = null;
         if (tags != null && tags.size() > 0) {
-            videoRecords = videoDao.findByTagInAndFlag(tags, pageable,"1" );
+            videoRecords = videoDao.findByTagInAndFlag(tags, pageable, "1");
         }
         return videoRecords;
     }
 
     public boolean existVideo(VideoRecord videoRecord) {
         VideoRecord record = videoDao.findOne(videoRecord.getId());
-        if(record != null && record.getId().equals(videoRecord.getId())){
+        if (record != null && record.getId().equals(videoRecord.getId())) {
             return true;
         }
         return false;
@@ -176,7 +184,7 @@ public class VideoService {
 
     @Transactional
     public void deleteVideo(VideoRecord videoRecord) {
-        videoDao.updateFlag(videoRecord.getId(),"3");
+        videoDao.updateFlag(videoRecord.getId(), "3");
     }
 
     public Page<VideoRecord> findAllPage(VideoRecord videoRecord, Pageable pageable) {
@@ -188,7 +196,7 @@ public class VideoService {
                 if (StringUtils.isNoneBlank(videoRecord.getVideoUrl())) {
                     predicates.add(criteriaBuilder.like(root.get("videoUrl").as(String.class), videoRecord.getVideoUrl() + "%"));
                 }
-                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class),"0"));
+                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class), "0"));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
@@ -196,7 +204,47 @@ public class VideoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void agreeOrShieldVideo(String id,String flag) {
-        videoDao.updateFlag(id,flag);
+    public void agreeOrShieldVideo(String id, String flag) {
+        videoDao.updateFlag(id, flag);
+    }
+
+    public void importVideo(List<List<String>> list) {
+        List<VideoRecord> videoRecords = new ArrayList<>();
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                     /*   System.out.print("第" + (i) + "行");
+                        List<String> cellList = list.get(i);
+                        for (int j = 0; j < cellList.size(); j++) {
+                            // System.out.print("    第" + (j + 1) + "列值：");
+                            System.out.print("    " + cellList.get(j));
+                        }
+                        System.out.println();*/
+                // 从第二行开始导入
+                if (i > 1) {
+                    List<String> cellList = list.get(i);
+                    VideoRecord videoRecord = new VideoRecord();
+                    videoRecord.setVideoUrl(cellList.get(0));
+                    videoRecord.setTitle(cellList.get(1));
+                    videoRecord.setVideoImgUrl(videoUrl+"/"+cellList.get(0)+".jpg");
+                    videoRecord.setMusicName(cellList.get(3));
+                    videoRecord.setUser(userDao.findByPhone(cellList.get(4)));
+                    videoRecord.setLatitude("121.508269");
+                    videoRecord.setLongitude("31.246255");
+                    videoRecord.setTag(videoTagDao.findByName(cellList.get(7)));
+                    videoRecord.setFlag("1");
+                    videoRecord.setViewAuth(ViewAuth.all);
+                    videoRecords.add(videoRecord);
+                }
+            }
+        }
+        videoDao.save(videoRecords);
+    }
+
+    public void updateVideoImage() {
+        List<VideoRecord> video = videoDao.findVideo();
+        for (VideoRecord record : video) {
+            record.setVideoImgUrl("http://www.miaoou.cc/video/" + record.getVideoUrl() + ".jpg");
+            videoDao.save(record);
+        }
     }
 }

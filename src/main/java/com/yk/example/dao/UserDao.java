@@ -37,4 +37,7 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
 
     @Query(" select count(1) from User u where u.directRecommendUser = ?1 or u.spaceRecommendUser = ?1 ")
     int countInviteUser(String userId);
+
+    User findByThirdUserId(String thirdUserId);
+
 }

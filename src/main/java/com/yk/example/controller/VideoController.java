@@ -4,7 +4,6 @@ import com.aliyuncs.auth.sts.AssumeRoleResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.ProtocolType;
 import com.yk.example.dto.ControllerResult;
-import com.yk.example.dto.UserInfoDto;
 import com.yk.example.entity.*;
 import com.yk.example.service.*;
 import com.yk.example.utils.VodUtils;
@@ -322,6 +321,6 @@ public class VideoController {
     @RequestMapping(value = "findVideoByTagName/{version}", method = RequestMethod.GET)
     public ControllerResult findVideoByTagName(@PathVariable String version, String tagName, int page, int size) {
         Page<VideoRecord> videoRecords = videoService.findByTag(tagName, new PageRequest(page, size));
-        return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
+        return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyMap() : videoRecords).setMessage("");
     }
 }

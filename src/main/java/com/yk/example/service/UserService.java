@@ -118,4 +118,8 @@ public class UserService {
     public void updateHeadImgUrl(String userId, String headImageUrl) {
         userDao.updateHeadImgUrl(userId, headImageUrl);
     }
+
+    public User findByThirdId(String thirdUserId) {
+        return userDao.findByThirdUserId(thirdUserId);
+    }
 }

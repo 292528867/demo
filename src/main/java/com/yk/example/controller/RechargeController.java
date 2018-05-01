@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import springfox.documentation.annotations.ApiIgnore;
@@ -50,6 +51,9 @@ public class RechargeController {
 
     RestTemplate restTemplate = new RestTemplate();
 
+    @Value("${spring.profiles.active}")
+    private String profilesActive;
+
     /**
      * 支付宝充值
      *
@@ -57,7 +61,7 @@ public class RechargeController {
      * @return
      */
     @ApiOperation(value = "支付宝充值")
-    @RequestMapping(value = "/aliPay/{version}",method = RequestMethod.POST)
+    @RequestMapping(value = "/aliPay/{version}", method = RequestMethod.POST)
     public ControllerResult aliPay(@RequestBody RechargeRecord rechargeRecord, @PathVariable String version) {
         //生成充值订单记录
         rechargeRecord.setPayType(PayType.zfb);
@@ -73,8 +77,11 @@ public class RechargeController {
         model.setSubject("支付宝充值");
         model.setOutTradeNo(newRecharge.getId());
         model.setTimeoutExpress("30m");
-        model.setTotalAmount("0.01");
-//        model.setTotalAmount(newRecharge.getMoney() + "");
+        if ("test".equals(profilesActive)) {
+            model.setTotalAmount("0.01");
+        } else {
+            model.setTotalAmount(newRecharge.getMoney() + "");
+        }
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setBizModel(model);
         request.setNotifyUrl(aliConfig.getNotifyUrl());
@@ -122,7 +129,7 @@ public class RechargeController {
             logger.info("验证签名是否通过：" + flag);
             if (flag) {
                 // 支付成功修改订单号状态
-                rechargeService.updatePayStatus(params.get("out_trade_no"), PayStatus.success );
+                rechargeService.updatePayStatus(params.get("out_trade_no"), PayStatus.success);
                 return "success";
             }
         } catch (AlipayApiException e) {

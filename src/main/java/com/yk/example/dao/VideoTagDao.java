@@ -13,4 +13,6 @@ public interface VideoTagDao extends CrudRepository<VideoTag,String> ,JpaSpecifi
 
 
     List<VideoTag> findByNameLike(String tagName);
+
+    VideoTag findByName(String s);
 }
