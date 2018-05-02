@@ -67,7 +67,7 @@ public class VideoRecord extends BaseEntity {
     @Column(name = "viewAuth", columnDefinition = " varchar(2) comment '查看权限 0 所有人可查看 1 好友查看 2 仅自己查看' ")
     private ViewAuth viewAuth;
 
-    @Column(name = "flag", columnDefinition = " varchar(2) comment '删除标志 0 已发布 1 用户删除 2 运营屏蔽' ")
+    @Column(name = "flag", columnDefinition = " varchar(2) comment '视频状态 0待审核 1 管理员审核通过 2 管理员屏蔽 3用户自己删除' ")
     private String flag;
 
     // 用户是否关注

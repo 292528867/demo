@@ -297,11 +297,14 @@ public class UserController {
         if (StringUtils.isBlank(thirdLogin.getHeadImgUrl())) {
             thirdLogin.setHeadImgUrl(userDefaultAvatarUrl);
         }
-        User user = userService.insertUser(thirdLogin);
-        // 生成融云token
-        TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
-        user.setRongCloudToken(tokenResult.getToken());
-        user = userService.insertUser(user);
+        User user =  userService.findByThirdId(thirdLogin.getThirdUserId());
+        if(user == null){
+             user = userService.insertUser(thirdLogin);
+            // 生成融云token
+            TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
+            user.setRongCloudToken(tokenResult.getToken());
+            user = userService.insertUser(user);
+        }
         return new ControllerResult().setRet_code(0).setRet_values(user).setMessage("登陆成功");
     }
 

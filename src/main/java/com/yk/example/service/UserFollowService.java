@@ -9,6 +9,7 @@ import com.yk.example.entity.User;
 import com.yk.example.entity.UserFollow;
 import com.yk.example.entity.UserInfo;
 import com.yk.example.entity.VideoRecord;
+import com.yk.example.utils.Distance;
 import com.yk.example.utils.JPushUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +70,8 @@ public class UserFollowService {
             userFollowDao.deleteByUserIdAndFollowId(userFollow.getUserId(),userFollow.getFollowId());
         }
         // 对follow用户进行推送
-        JPushUtils.sendAlias(user.getNickName() + new DateTime(new Date()).toString("yyyy-MM-dd") + "关注了您",
-                Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
+    /*    JPushUtils.sendAlias(user.getNickName() + new DateTime(new Date()).toString("yyyy-MM-dd") + "关注了您",
+                Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());*/
         return userFollow;
     }
 
@@ -106,8 +107,9 @@ public class UserFollowService {
         List<String> byUserId = userFollowDao.findByUserId(userId, true);
         if (byUserId != null && byUserId.size() > 0) {
             for (String id : byUserId) {
-                VideoRecord videoRecord = videoDao.findLastVideoByUser(id);
-                if (videoRecord != null) {
+                List<VideoRecord> videoRecordList= videoDao.findLastVideoByUser(id);
+                if(videoRecordList != null && videoRecordList.size() >0){
+                    VideoRecord videoRecord = videoRecordList.get(0);
                     videoRecords.add(videoRecord);
                 }
             }

@@ -62,6 +62,19 @@ public class UserInfo {
     @JoinColumn(name = "user_id", columnDefinition = " varchar(50) comment '用户id ' ")
     private User user;
 
+
+    @Column(name = "zan_push", columnDefinition = "ENUM( 'true' , 'false') NOT NULL DEFAULT 'true' comment '是否推送点赞'")
+    private boolean zanPush ;
+
+    @Column(name = "follow_push", columnDefinition = "ENUM( 'true' , 'false') NOT NULL DEFAULT 'true' comment '是否推送关注'")
+    private boolean followPush ;
+
+    @Column(name = "comment_push", columnDefinition = "ENUM( 'true' , 'false') NOT NULL DEFAULT 'true' comment '是否推送评论'")
+    private boolean commentPush ;
+
+    @Column(name = "video_follow_push", columnDefinition = "ENUM( 'true' , 'false') NOT NULL DEFAULT 'true' comment '是否推送关注人视频'")
+    private boolean videoFollowPush ;
+
     @CreationTimestamp
     private Date createTime;
 
@@ -196,5 +209,35 @@ public class UserInfo {
         this.address = address;
     }
 
+    public boolean isZanPush() {
+        return zanPush;
+    }
 
+    public void setZanPush(boolean zanPush) {
+        this.zanPush = zanPush;
+    }
+
+    public boolean isFollowPush() {
+        return followPush;
+    }
+
+    public void setFollowPush(boolean followPush) {
+        this.followPush = followPush;
+    }
+
+    public boolean isCommentPush() {
+        return commentPush;
+    }
+
+    public void setCommentPush(boolean commentPush) {
+        this.commentPush = commentPush;
+    }
+
+    public boolean isVideoFollowPush() {
+        return videoFollowPush;
+    }
+
+    public void setVideoFollowPush(boolean videoFollowPush) {
+        this.videoFollowPush = videoFollowPush;
+    }
 }

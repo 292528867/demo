@@ -85,6 +85,7 @@ public class UserInfoService {
         userInfoDto.setProfession(info.getProfession());
         userInfoDto.setAccountIncome(info.getAccountIncome());
         userInfoDto.setMiaoPeas(info.getMiaoPeas());
+        userInfoDto.setVip(newUser.isVip());
         return userInfoDto;
     }
 
@@ -103,6 +104,7 @@ public class UserInfoService {
         userInfoDto.setProfession(userInfo.getProfession());
         userInfoDto.setAccountIncome(userInfo.getAccountIncome());
         userInfoDto.setMiaoPeas(userInfo.getMiaoPeas());
+        userInfoDto.setVip(user.isVip());
         return userInfoDto;
     }
 

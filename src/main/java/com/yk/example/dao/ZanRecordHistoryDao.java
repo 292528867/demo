@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface ZanRecordHistoryDao extends CrudRepository<ZanRecordHistory, String>, JpaSpecificationExecutor {
     List<ZanRecordHistory> findByFromUserId(String userId);
+
+    List<ZanRecordHistory> findByToUserId(String userId);
 }

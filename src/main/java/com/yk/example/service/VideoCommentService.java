@@ -1,5 +1,6 @@
 package com.yk.example.service;
 
+import com.yk.example.dao.UserDao;
 import com.yk.example.dao.VideoCommentDao;
 import com.yk.example.dao.VideoDao;
 import com.yk.example.entity.User;
@@ -29,15 +30,19 @@ public class VideoCommentService {
     @Autowired
     private VideoDao videoDao;
 
+    @Autowired
+    private UserDao userDao;
+
     @Transactional(rollbackFor = Exception.class)
     public VideoComment save(VideoComment videoComment) {
+        User user = userDao.findOne(videoComment.getUser().getUserId());
         VideoComment comment = videoCommentDao.save(videoComment);
         String videoId = videoComment.getVideoRecord().getId();
         VideoRecord video = videoDao.findOne(videoId);
         int num = video.getCommentNum() + 1;
         videoDao.updateCommentNum(num, videoId);
         // 对被评论人进行推送
-        JPushUtils.sendAlias(videoComment.getUser().getNickName() + "在" + new DateTime(new Date()).toString("yyyy-MM-dd hh:mm") + "评论了您的视频",
+        JPushUtils.sendAlias(user.getNickName() + "在" + new DateTime(new Date()).toString("yyyy-MM-dd hh:mm") + "评论了您的视频",
                 Collections.singletonList(video.getUser().getUserId()), Collections.singletonMap("videoId", videoId));
         return comment;
     }
