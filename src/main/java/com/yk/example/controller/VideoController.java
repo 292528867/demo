@@ -5,6 +5,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.ProtocolType;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.entity.*;
+import com.yk.example.enums.ZanStatus;
 import com.yk.example.service.*;
 import com.yk.example.utils.VodUtils;
 import io.swagger.annotations.ApiOperation;
@@ -130,7 +131,10 @@ public class VideoController {
     @RequestMapping(value = "videoZan/{version}", method = RequestMethod.POST)
     public ControllerResult videoZan(@RequestBody VideoZan videoZan, @PathVariable String version) {
         if (StringUtils.isNotBlank(videoZan.getUser().getUserId())) {
-            VideoZan newZan = videoZanService.findByUserAndVideo(videoZan);
+            VideoZan newZan = null;
+            if(videoZan.getZanStatus().equals(ZanStatus.zan)){
+                newZan = videoZanService.findByUserAndVideo(videoZan);
+            }
             if (newZan == null) {
                 videoZanService.save(videoZan);
                 return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");

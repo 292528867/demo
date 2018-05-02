@@ -1,7 +1,9 @@
 package com.yk.example.service;
 
+import com.yk.example.dao.PushSetDao;
 import com.yk.example.dao.UserDao;
 import com.yk.example.dao.UserInfoDao;
+import com.yk.example.entity.PushSet;
 import com.yk.example.entity.User;
 import com.yk.example.entity.UserInfo;
 import com.yk.example.utils.Md5Utlls;
@@ -41,6 +43,9 @@ public class UserService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private PushSetDao pushSetDao;
+
     public User insertUser(User user) {
         if (StringUtils.isNotBlank(user.getUserId())) {
             // 修改
@@ -59,6 +64,9 @@ public class UserService {
             UserInfo userInfo = new UserInfo();
             userInfo.setUser(user);
             userInfoDao.save(userInfo);
+            PushSet pushSet = new PushSet();
+            pushSet.setUserId(user.getUserId());
+            pushSetDao.save(pushSet);
         }
         return user;
     }

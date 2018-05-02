@@ -16,4 +16,7 @@ public interface VideoZanDao extends CrudRepository<VideoZan, String>, JpaSpecif
     VideoZan isZan(String videoId, String userId);
 
     VideoZan findByUserAndVideoRecord(User user, VideoRecord videoRecord);
+
+    void deleteByUserAndVideoRecord(User user, VideoRecord videoRecord);
+
 }

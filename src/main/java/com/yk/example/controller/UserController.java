@@ -1,13 +1,16 @@
 package com.yk.example.controller;
 
 import com.google.gson.JsonObject;
+import com.yk.example.dto.BindDto;
 import com.yk.example.dto.ControllerResult;
 import com.yk.example.dto.UserInfoDto;
 import com.yk.example.dto.UserLocation;
+import com.yk.example.entity.ThirdUser;
 import com.yk.example.entity.User;
 import com.yk.example.entity.UserFollow;
 import com.yk.example.enums.UserType;
 import com.yk.example.rongCloud.models.response.TokenResult;
+import com.yk.example.service.ThirdUserService;
 import com.yk.example.service.UserFollowService;
 import com.yk.example.service.UserInfoService;
 import com.yk.example.service.UserService;
@@ -66,6 +69,9 @@ public class UserController {
 
     @Value("${user_default_avatar_url}")
     private String userDefaultAvatarUrl;
+
+    @Autowired
+    private ThirdUserService thirdUserService;
 
     /**
      * app 用户注册
@@ -228,6 +234,31 @@ public class UserController {
     }
 
     /**
+     * 绑定手机号验证码
+     *
+     * @param phone
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "绑定手机号验证码")
+    @RequestMapping(value = "bindPhoneSendSms/{phone}/{version}", method = RequestMethod.GET)
+    public ControllerResult bindPhoneSendSms(@PathVariable String phone, @PathVariable String version) {
+        if (StringUtils.isBlank(phone)) {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("手机号不能为空");
+        }
+        String code = RandomStringUtils.randomNumeric(4);
+        boolean result = SmsUtils.sendSms(phone, code, "246427", 10);
+        logger.info(new Date() + "发送短信验证码为：" + code);
+        if (result) {
+            // 保存到redis 5分钟后过期
+            redisTemplate.opsForValue().set(phone + "_bind", code, 5, TimeUnit.MINUTES);
+            return new ControllerResult().setRet_code(0).setRet_values("").setMessage("发送成功，耐心等待");
+        } else {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("发送失败");
+        }
+    }
+
+    /**
      * 登陆
      *
      * @param login
@@ -283,29 +314,107 @@ public class UserController {
     }
 
     /**
-     * 第三方登陆
+     * 判断是否绑定过手机号
+     *
+     * @param thirdLogin
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "判断是否绑定过手机号")
+    @RequestMapping(value = "judgeIsBindPhone/{version}", method = RequestMethod.POST)
+    public ControllerResult judgeIsBindPhone(@RequestBody User thirdLogin, @PathVariable String version) {
+        ThirdUser thirdUser = thirdUserService.findThirdUser(thirdLogin.getThirdUserId());
+        if (thirdUser == null) {
+            return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("没有绑定过手机号");
+        } else {
+            User user = userService.findOne(thirdUser.getUser().getUserId());
+            return new ControllerResult().setRet_code(0).setRet_values(user).setMessage("登陆成功");
+        }
+    }
+
+    /**
+     * 第三方登陆(绑定手机号)
      *
      * @param thirdLogin
      * @return
      */
-    @ApiOperation(value = "第三方登录")
+    @ApiOperation(value = "第三方登陆(绑定手机号)")
     @RequestMapping(value = "thirdLogin/{version}", method = RequestMethod.POST)
     public ControllerResult thirdLogin(@RequestBody User thirdLogin, @PathVariable String version) {
-        if (StringUtils.isBlank(thirdLogin.getNickName())) {
-            thirdLogin.setNickName(RandomStringUtils.randomNumeric(8));
+        if ("1".equals(version)) {
+            if (StringUtils.isBlank(thirdLogin.getNickName())) {
+                thirdLogin.setNickName(RandomStringUtils.randomNumeric(8));
+            }
+            if (StringUtils.isBlank(thirdLogin.getHeadImgUrl())) {
+                thirdLogin.setHeadImgUrl(userDefaultAvatarUrl);
+            }
+            User user = userService.findByThirdId(thirdLogin.getThirdUserId());
+            if (user == null) {
+                user = userService.insertUser(thirdLogin);
+                // 生成融云token
+                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
+                user.setRongCloudToken(tokenResult.getToken());
+                user = userService.insertUser(user);
+            }
+            return new ControllerResult().setRet_code(0).setRet_values(user).setMessage("登陆成功");
         }
-        if (StringUtils.isBlank(thirdLogin.getHeadImgUrl())) {
-            thirdLogin.setHeadImgUrl(userDefaultAvatarUrl);
+        // 第三方登录版本号2
+        else if ("2".equals(version)) {
+            String code = thirdLogin.getCode();
+            String redisCode = redisTemplate.opsForValue().get(thirdLogin.getPhone() + "_bind");
+            if (!redisCode.equals(code)) {
+                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("验证码错误");
+            }
+            // 判断手机号是否已注册过
+            User user = userService.findByPhone(thirdLogin.getPhone());
+            if (user == null) {
+                user = userService.insertUser(thirdLogin);
+                // 生成融云token
+                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
+                user.setRongCloudToken(tokenResult.getToken());
+                user = userService.insertUser(user);
+                ThirdUser thirdUser = new ThirdUser();
+                thirdUser.setHeadImgUrl(thirdLogin.getHeadImgUrl());
+                thirdUser.setNickName(thirdLogin.getNickName());
+                thirdUser.setThirdUserId(thirdLogin.getThirdUserId());
+                // 绑定
+                thirdUser.setStatus("1");
+                thirdUser.setUser(user);
+                thirdUser.setUserType(thirdLogin.getUserType());
+                thirdUserService.save(thirdUser);
+            } else {
+                // 判断用户图像头像和昵称是否需要改变
+
+                // 如果没有第三方用户 就添加一条记录并绑定userId
+                ThirdUser existThirdUser = thirdUserService.findThirdUser(thirdLogin.getThirdUserId());
+                if (existThirdUser == null) {
+                    ThirdUser thirdUser = new ThirdUser();
+                    thirdUser.setHeadImgUrl(thirdLogin.getHeadImgUrl());
+                    thirdUser.setNickName(thirdLogin.getNickName());
+                    thirdUser.setThirdUserId(thirdLogin.getThirdUserId());
+                    // 绑定
+                    thirdUser.setStatus("1");
+                    thirdUser.setUser(user);
+                    thirdUser.setUserType(thirdLogin.getUserType());
+                    thirdUserService.save(thirdUser);
+                }
+            }
+            return new ControllerResult().setRet_code(0).setRet_values(user).setMessage("登陆成功");
         }
-        User user =  userService.findByThirdId(thirdLogin.getThirdUserId());
-        if(user == null){
-             user = userService.insertUser(thirdLogin);
-            // 生成融云token
-            TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
-            user.setRongCloudToken(tokenResult.getToken());
-            user = userService.insertUser(user);
-        }
-        return new ControllerResult().setRet_code(0).setRet_values(user).setMessage("登陆成功");
+        return null;
+    }
+
+    /**
+     *  查看第三方账号绑定状态
+     * @param userId
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "查看第三方账号绑定状态")
+    @RequestMapping(value = "queryBindStatus",method = RequestMethod.GET)
+    public ControllerResult queryBindStatus(@PathVariable String userId, @PathVariable String version){
+        BindDto bindDto = thirdUserService.queryBindStatus(userId);
+        return new ControllerResult().setRet_code(0).setRet_values(bindDto).setMessage("");
     }
 
     /**
@@ -391,7 +500,7 @@ public class UserController {
     @ApiOperation(value = "关注用户")
     @RequestMapping(value = "followUser/{version}", method = RequestMethod.POST)
     public ControllerResult followUser(@RequestBody UserFollow userFollow, @PathVariable String version) {
-        if(userFollow.isStatus()){
+        if (userFollow.isStatus()) {
             UserFollow follow = userFollowService.existFollow(userFollow);
             if (follow != null) {
                 return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("已关注该用户");
