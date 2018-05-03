@@ -117,33 +117,52 @@ public class VideoService {
             }
         };
         Page<VideoRecord> recordPage = videoDao.findAll(specification, pageable);
-        // 判断是否关注
+        // 判断是否关注和是否点赞
         List<VideoRecord> records = recordPage.getContent();
         if (StringUtils.isNoneBlank(userId)) {
             List<String> followUser = userFollowDao.findByUserId(userId, true);
-            if (followUser != null && followUser.size() > 0) {
-                for (VideoRecord videoRecord : records) {
-                    boolean flag = false;
+            User user = new User();
+            user.setUserId(userId);
+            List<VideoZan> videoZanList = videoZanDao.findByUser(user);
+
+            for (VideoRecord videoRecord : records) {
+                boolean followFlag = false;
+                boolean zanFlag = false;
+                if (followUser != null && followUser.size() > 0) {
                     for (String followUserId : followUser) {
                         if (videoRecord.getUser().getUserId().equals(followUserId)) {
                             videoRecord.setFollow(true);
-                            flag = true;
+                            followFlag = true;
                         }
                     }
-                    if(!flag){
-                       videoRecord.setFollow(false);
+                }
+                if (!followFlag) {
+                    videoRecord.setFollow(false);
+                }
+                if (videoZanList != null && videoZanList.size() > 0) {
+                    for (VideoZan videoZan : videoZanList) {
+                       if (videoZan.getVideoRecord().getId().equals(videoRecord.getId())){
+                            videoRecord.setZan(true);
+                           zanFlag = true;
+                       }
                     }
+                }
+                if(!zanFlag){
+                    videoRecord.setZan(false);
                 }
             }
         }
-        return  new PageImpl(records, pageable, recordPage.getTotalElements());
+        return new PageImpl(records, pageable, recordPage.getTotalElements());
     }
 
     public VideoRecord findOne(String videoId, String userId) {
         VideoRecord videoRecord = videoDao.findOne(videoId);
         if (StringUtils.isNotBlank(userId)) {
             // 判断是否点赞
-            VideoZan videoZan = videoZanDao.isZan(videoId, userId);
+//            VideoZan videoZan = videoZanDao.isZan(videoId, userId);
+            User user = new User();
+            user.setUserId(userId);
+            VideoZan videoZan = videoZanDao.findByUserAndVideoRecord(user, videoRecord);
             if (videoZan == null) {
                 videoRecord.setZan(false);
             } else {

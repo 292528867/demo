@@ -405,14 +405,43 @@ public class UserController {
     }
 
     /**
-     *  查看第三方账号绑定状态
+     * 绑定第三方账号
+     *
+     * @param thirdLogin
+     * @param version
+     * @return
+     */
+    @ApiOperation("绑定第三方账号")
+    @RequestMapping(value = "bindThirdUser/{version}", method = RequestMethod.POST)
+    public ControllerResult bindThirdUser(@RequestBody User thirdLogin, @PathVariable String version) {
+        ThirdUser thirdUser = thirdUserService.findThirdUser(thirdLogin.getThirdUserId());
+        if (thirdUser != null) {
+            return new ControllerResult().setRet_code(1).setRet_values("").setMessage("已绑定过该账号");
+        }
+        thirdUser = new ThirdUser();
+        thirdUser.setHeadImgUrl(thirdLogin.getHeadImgUrl());
+        thirdUser.setNickName(thirdLogin.getNickName());
+        thirdUser.setThirdUserId(thirdLogin.getThirdUserId());
+        // 绑定
+        thirdUser.setStatus("1");
+        User user = new User();
+        user.setUserId(thirdLogin.getUserId());
+        thirdUser.setUser(user);
+        thirdUser.setUserType(thirdLogin.getUserType());
+        thirdUserService.save(thirdUser);
+        return new ControllerResult().setRet_code(0).setRet_values("").setMessage("绑定成功");
+    }
+
+    /**
+     * 查看第三方账号绑定状态
+     *
      * @param userId
      * @param version
      * @return
      */
     @ApiOperation(value = "查看第三方账号绑定状态")
-    @RequestMapping(value = "queryBindStatus",method = RequestMethod.GET)
-    public ControllerResult queryBindStatus(@PathVariable String userId, @PathVariable String version){
+    @RequestMapping(value = "queryBindStatus/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult queryBindStatus(@PathVariable String userId, @PathVariable String version) {
         BindDto bindDto = thirdUserService.queryBindStatus(userId);
         return new ControllerResult().setRet_code(0).setRet_values(bindDto).setMessage("");
     }

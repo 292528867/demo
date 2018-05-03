@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 /**
  * Created by yk on 2018/4/4.
  */
@@ -19,4 +21,5 @@ public interface VideoZanDao extends CrudRepository<VideoZan, String>, JpaSpecif
 
     void deleteByUserAndVideoRecord(User user, VideoRecord videoRecord);
 
+    List<VideoZan> findByUser(User user);
 }

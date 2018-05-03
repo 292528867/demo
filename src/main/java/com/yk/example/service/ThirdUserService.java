@@ -5,6 +5,7 @@ import com.yk.example.dao.UserDao;
 import com.yk.example.dto.BindDto;
 import com.yk.example.entity.ThirdUser;
 import com.yk.example.entity.User;
+import com.yk.example.enums.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,25 @@ public class ThirdUserService {
     public BindDto queryBindStatus(String userId) {
         User user = userDao.findOne(userId);
         List<ThirdUser> thirdUsers = thirduserDao.findByUser(user);
-        return null;
+        BindDto dto = new BindDto();
+        dto.setPhone(user.getPhone());
+        dto.setUserId(user.getUserId());
+        dto.setQqStatus(false);
+        dto.setWxStatus(false);
+        dto.setWbStatus(false);
+        if(thirdUsers != null && thirdUsers.size() > 0){
+             for(ThirdUser thirdUser : thirdUsers){
+                 if(thirdUser.getUserType().equals(UserType.qq)){
+                       dto.setQqStatus(true);
+                 }
+                 if(thirdUser.getUserType().equals(UserType.wx)){
+                     dto.setWxStatus(true);
+                 }
+                 if(thirdUser.getUserType().equals(UserType.wb)){
+                     dto.setWbStatus(true);
+                 }
+             }
+        }
+        return dto;
     }
 }
