@@ -57,7 +57,7 @@ public class VideoZanService {
         User user = userDao.findOne(videoZan.getUser().getUserId());
         // 对被点赞人进行推送
         if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
-              videoZanDao.save(videoZan);
+            videoZanDao.save(videoZan);
             // 保存点赞记录
             ZanRecordHistory zanRecordHistory = new ZanRecordHistory();
             zanRecordHistory.setZanType(ZanType.video);
@@ -70,12 +70,12 @@ public class VideoZanService {
             zanRecordHistory.setNickName(user.getNickName());
             zanRecordHistory.setHeadImgUrl(user.getHeadImgUrl());
             zanRecordHistoryDao.save(zanRecordHistory);
-            JPushUtils.sendAlias(user.getNickName() + "在" + new DateTime(new Date()).toString("yyyy-MM-dd hh:mm") + "点赞您的视频",
+            JPushUtils.sendAlias(user.getNickName() + "点赞您的视频",
                     Collections.singletonList(videoRecord.getUser().getUserId()), Collections.singletonMap("videoId", videoRecord.getId()));
         } else {
-            videoZanDao.deleteByUserAndVideoRecord(user,videoRecord);
+            videoZanDao.deleteByUserAndVideoRecord(user, videoRecord);
             zanRecordHistoryDao.deleteByVideoIdAndFromUserId(videoId, videoZan.getUser().getUserId());
-            JPushUtils.sendAlias(user.getNickName() + "在" + new DateTime(new Date()).toString("yyyy-MM-dd hh:mm") + "取消点赞您的视频",
+            JPushUtils.sendAlias(user.getNickName() + "取消点赞您的视频",
                     Collections.singletonList(videoRecord.getUser().getUserId()), Collections.singletonMap("videoId", videoRecord.getId()));
         }
         return null;

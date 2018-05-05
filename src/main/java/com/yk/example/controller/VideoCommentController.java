@@ -56,8 +56,8 @@ public class VideoCommentController {
      */
     @ApiOperation(value = "查询视频的评论列表")
     @RequestMapping(value = "findComment/{videoId}/{version}", method = RequestMethod.GET)
-    public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version,int page ,int size) {
-        Page<VideoComment> videoCommentPage = videoCommentService.findAllByVideoId(videoId,new PageRequest(page,size));
+    public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version,int page ,int size,String userId) {
+        Page<VideoComment> videoCommentPage = videoCommentService.findAllByVideoId(videoId,new PageRequest(page,size),userId);
         return new ControllerResult().setRet_code(0).setRet_values(videoCommentPage).setMessage("");
     }
 

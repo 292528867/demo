@@ -2,6 +2,7 @@ package com.yk.example.dao;
 
 import com.yk.example.entity.ThirdUser;
 import com.yk.example.entity.User;
+import com.yk.example.enums.UserType;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
@@ -15,4 +16,6 @@ public interface ThirduserDao extends CrudRepository<ThirdUser, String>, JpaSpec
     ThirdUser findByThirdUserIdAndStatus(String thirdUserId, String s);
 
     List<ThirdUser> findByUser(User user);
+
+    ThirdUser findByUserAndUserType(User user, UserType userType);
 }

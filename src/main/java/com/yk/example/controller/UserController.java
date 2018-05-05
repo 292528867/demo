@@ -385,6 +385,10 @@ public class UserController {
             } else {
                 // 判断用户图像头像和昵称是否需要改变
 
+                ThirdUser thirdUser1 = thirdUserService.findThirdUserByUserType(user, thirdLogin.getUserType());
+                if(thirdUser1 != null){
+                    return new ControllerResult().setRet_code(1).setRet_values("").setMessage("该手机号已绑定其他账号");
+                }
                 // 如果没有第三方用户 就添加一条记录并绑定userId
                 ThirdUser existThirdUser = thirdUserService.findThirdUser(thirdLogin.getThirdUserId());
                 if (existThirdUser == null) {

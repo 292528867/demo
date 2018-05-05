@@ -10,7 +10,7 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface AppVersionDao extends CrudRepository<AppVersion, String>, JpaSpecificationExecutor<AppVersion> {
 
-    @Query(" from  AppVersion av where av.createTime = ( select max(v.createTime) from AppVersion  v  )")
+    @Query(" from  AppVersion av where av.version = ( select max(v.createTime) from AppVersion  v  )")
     AppVersion getLastVersion();
 
 }

@@ -24,6 +24,16 @@ public class VideoComment extends BaseEntity {
     @JoinColumn(name = "video_id")
     private VideoRecord videoRecord;
 
+    @Transient
+    private boolean zanStatus = false;
+
+    public boolean isZanStatus() {
+        return zanStatus;
+    }
+
+    public void setZanStatus(boolean zanStatus) {
+        this.zanStatus = zanStatus;
+    }
 
     public VideoRecord getVideoRecord() {
         return videoRecord;

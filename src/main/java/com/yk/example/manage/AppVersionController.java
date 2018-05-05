@@ -3,6 +3,8 @@ package com.yk.example.manage;
 import com.yk.example.entity.AppVersion;
 import com.yk.example.service.AppVersionService;
 import com.yk.example.utils.PageUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,8 @@ import java.io.IOException;
 @ApiIgnore
 @Controller
 public class AppVersionController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AppVersionController.class);
 
     @Autowired
     private AppVersionService appVersionService;
@@ -76,18 +80,20 @@ public class AppVersionController {
         if (file != null) {
             String fileName = file.getOriginalFilename();
             try {
+                logger.info("开始上传apk包，上传路径为：" + apkPath + "/" + fileName);
                 FileOutputStream outputStream = new FileOutputStream(apkPath + "/" + fileName);
                 outputStream.write(file.getBytes());
                 outputStream.flush();
                 outputStream.close();
+                logger.info("apk上传完成");
                 appVersion.setDownUrl(apkUrl + fileName);
+                appVersionService.save(appVersion);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        appVersionService.save(appVersion);
         return "redirect:versionList_0_0_0";
     }
 }

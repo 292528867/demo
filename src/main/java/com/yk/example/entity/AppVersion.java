@@ -18,8 +18,8 @@ import java.io.File;
 @JsonIgnoreProperties({"file"})
 public class AppVersion extends BaseEntity {
 
-    @Column(name = "version", columnDefinition = "varchar(3) comment '版本号'")
-    private String version;
+    @Column(name = "version", columnDefinition = "int comment '版本号'")
+    private int version;
 
     @Column(name = "apk_name", columnDefinition = "varchar(255) comment 'apk版本名称'")
     private String apkName;
@@ -42,11 +42,11 @@ public class AppVersion extends BaseEntity {
         this.file = file;
     }
 
-    public String getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

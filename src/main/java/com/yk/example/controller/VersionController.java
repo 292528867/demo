@@ -20,14 +20,14 @@ public class VersionController {
     @Autowired
     private AppVersionService appVersionService;
 
-    @RequestMapping(value = "checkVersion/{version}",method = RequestMethod.GET)
-    public ControllerResult checkVersion(@PathVariable String version, int apkVersion){
-        AppVersion lastVersion =  appVersionService.getLastVersion();
-        if(lastVersion != null){
+    @RequestMapping(value = "checkVersion/{version}", method = RequestMethod.GET)
+    public ControllerResult checkVersion(@PathVariable String version, int apkVersion) {
+        AppVersion lastVersion = appVersionService.getLastVersion();
+        if (lastVersion != null) {
             // 判断版本大小
-          if(Integer.parseInt(lastVersion.getVersion()) > apkVersion){
-              return new ControllerResult().setRet_code(0).setRet_values(lastVersion).setMessage("");
-          }
+            if (lastVersion.getVersion() > apkVersion) {
+                return new ControllerResult().setRet_code(0).setRet_values(lastVersion).setMessage("");
+            }
         }
         return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("不需要更新");
     }

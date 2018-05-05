@@ -1,14 +1,9 @@
 package com.yk.example.service;
 
-import com.yk.example.dao.UserDao;
-import com.yk.example.dao.UserFollowDao;
-import com.yk.example.dao.UserInfoDao;
-import com.yk.example.dao.VideoDao;
+import com.yk.example.dao.*;
 import com.yk.example.dto.FansDto;
-import com.yk.example.entity.User;
-import com.yk.example.entity.UserFollow;
-import com.yk.example.entity.UserInfo;
-import com.yk.example.entity.VideoRecord;
+import com.yk.example.entity.*;
+import com.yk.example.utils.BeanSort;
 import com.yk.example.utils.Distance;
 import com.yk.example.utils.JPushUtils;
 import org.joda.time.DateTime;
@@ -36,6 +31,9 @@ public class UserFollowService {
 
     @Autowired
     private UserInfoDao userInfoDao;
+
+    @Autowired
+    private VideoZanDao videoZanDao;
 
     @Transactional(rollbackFor = Exception.class)
     public UserFollow save(UserFollow userFollow) {
@@ -65,13 +63,18 @@ public class UserFollowService {
         followUserInfo.setFanNum(fanNum);
         userInfoDao.save(followUserInfo);
         if (userFollow.isStatus()) {
-             userFollowDao.save(userFollow);
+            userFollowDao.save(userFollow);
         } else {
-            userFollowDao.deleteByUserIdAndFollowId(userFollow.getUserId(),userFollow.getFollowId());
+            userFollowDao.deleteByUserIdAndFollowId(userFollow.getUserId(), userFollow.getFollowId());
         }
         // 对follow用户进行推送
-    /*    JPushUtils.sendAlias(user.getNickName() + new DateTime(new Date()).toString("yyyy-MM-dd") + "关注了您",
-                Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());*/
+        if (userFollow.isStatus()) {
+            JPushUtils.sendAlias(user.getNickName() + "关注了您",
+                    Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
+        } else {
+            JPushUtils.sendAlias(user.getNickName() + "对您取消关注",
+                    Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
+        }
         return userFollow;
     }
 
@@ -105,19 +108,34 @@ public class UserFollowService {
     public List<VideoRecord> findByUserId(String userId) {
         List<VideoRecord> videoRecords = new ArrayList<>();
         List<String> byUserId = userFollowDao.findByUserId(userId, true);
+        User user = new User();
+        user.setUserId(userId);
+        List<VideoZan> videoZanList = videoZanDao.findByUser(user);
         if (byUserId != null && byUserId.size() > 0) {
             for (String id : byUserId) {
-                List<VideoRecord> videoRecordList= videoDao.findLastVideoByUser(id);
-                if(videoRecordList != null && videoRecordList.size() >0){
+                List<VideoRecord> videoRecordList = videoDao.findLastVideoByUser(id);
+                if (videoRecordList != null && videoRecordList.size() > 0) {
                     VideoRecord videoRecord = videoRecordList.get(0);
+                    videoRecord.setFollow(true);
+                    for (VideoZan videoZan : videoZanList){
+                        if(videoRecord.getId().equals(videoZan.getVideoRecord().getId())){
+                              videoRecord.setZan(true);
+                        }
+                    }
                     videoRecords.add(videoRecord);
                 }
             }
         }
+        BeanSort.sort(videoRecords, "createTime", false);
         return videoRecords;
     }
 
     public UserFollow existFollow(UserFollow userFollow) {
-       return userFollowDao.findByUserIdAndFollowId(userFollow.getUserId(),userFollow.getFollowId());
+        return userFollowDao.findByUserIdAndFollowId(userFollow.getUserId(), userFollow.getFollowId());
+    }
+
+
+    public UserFollow existFollow(String userId, String otherUserId) {
+        return userFollowDao.findByUserIdAndFollowId(userId, otherUserId);
     }
 }

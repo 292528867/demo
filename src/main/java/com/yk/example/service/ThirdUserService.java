@@ -57,4 +57,8 @@ public class ThirdUserService {
         }
         return dto;
     }
+
+    public ThirdUser findThirdUserByUserType(User user, UserType userType) {
+        return thirduserDao.findByUserAndUserType(user, userType);
+    }
 }

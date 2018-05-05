@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2017/8/8.
  */
@@ -40,4 +42,5 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
 
     User findByThirdUserId(String thirdUserId);
 
+    List<User> findByNickNameLike(String nickName);
 }

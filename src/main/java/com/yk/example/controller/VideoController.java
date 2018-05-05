@@ -13,8 +13,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -50,6 +49,9 @@ public class VideoController {
     @Autowired
     private UserInfoService userInfoService;
 
+    @Autowired
+    private UserService userService;
+
     @Value("${AccessKeyId}")
     private String accessKeyId;
 
@@ -83,14 +85,14 @@ public class VideoController {
      */
     @ApiOperation(value = "推荐的视频")
     @RequestMapping(value = "recommend/{version}", method = RequestMethod.GET)
-    public ControllerResult recommend(String userId, @PathVariable String version,String page ,String size) {
-       if("1".equals(version)){
-           List<VideoRecord> videoRecords = videoService.recommend(userId);
-           return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
-       }else if("2".equals(version)){
-           Page<VideoRecord> videoRecordPage = videoService.recommend(userId, new PageRequest(Integer.parseInt(page), Integer.parseInt(size)));
-           return new ControllerResult().setRet_code(0).setRet_values(videoRecordPage).setMessage("");
-       }
+    public ControllerResult recommend(String userId, @PathVariable String version, String page, String size) {
+        if ("1".equals(version)) {
+            List<VideoRecord> videoRecords = videoService.recommend(userId);
+            return new ControllerResult().setRet_code(0).setRet_values(videoRecords == null ? Collections.emptyList() : videoRecords).setMessage("");
+        } else if ("2".equals(version)) {
+            Page<VideoRecord> videoRecordPage = videoService.recommend(userId, new PageRequest(Integer.parseInt(page), Integer.parseInt(size)));
+            return new ControllerResult().setRet_code(0).setRet_values(videoRecordPage).setMessage("");
+        }
         return null;
     }
 
@@ -132,7 +134,7 @@ public class VideoController {
     public ControllerResult videoZan(@RequestBody VideoZan videoZan, @PathVariable String version) {
         if (StringUtils.isNotBlank(videoZan.getUser().getUserId())) {
             VideoZan newZan = null;
-            if(videoZan.getZanStatus().equals(ZanStatus.zan)){
+            if (videoZan.getZanStatus().equals(ZanStatus.zan)) {
                 newZan = videoZanService.findByUserAndVideo(videoZan);
             }
             if (newZan == null) {
@@ -279,11 +281,14 @@ public class VideoController {
     @ApiOperation(value = "我喜欢的视频")
     @RequestMapping(value = "myLike/{userId}/{version}", method = RequestMethod.GET)
     public ControllerResult myLike(@PathVariable String version, @PathVariable String userId, int page, int size) {
-        Page<VideoCollect> videoCollects = videoCollectService.findByUserId(userId, new PageRequest(page, size));
+        // 创建时间排序
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Page<VideoCollect> videoCollects = videoCollectService.findByUserId(userId, new PageRequest(page, size, sort));
+        PageImpl<VideoCollect> videoCollectPage = new PageImpl<VideoCollect>(videoCollects.getContent(), new PageRequest(page, size), videoCollects.getTotalElements());
         UserInfo userInfo = userInfoService.findUserInfo(userId);
         long videoNum = videoService.countByUserId(userId);
         Map<String, Object> result = new HashMap<>();
-        result.put("videoCollects", videoCollects);
+        result.put("videoCollects", videoCollectPage);
         result.put("zanNum", userInfo.getZanNum());
         result.put("fanNum", userInfo.getFanNum());
         result.put("followNum", userInfo.getFollowNum());
@@ -302,16 +307,106 @@ public class VideoController {
     @ApiOperation(value = "我的作品")
     @RequestMapping(value = "myVideo/{userId}/{version}", method = RequestMethod.GET)
     public ControllerResult myVideo(@PathVariable String version, @PathVariable String userId, int page, int size) {
-        Page<VideoRecord> videoRecords = videoService.findByUser(userId, new PageRequest(page, size));
+        // 创建时间排序
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Pageable pageable = new PageRequest(page, size, sort);
+        Page<VideoRecord> videoRecords = videoService.findByUser(userId, pageable);
+        PageImpl<VideoRecord> videoRecordPage = new PageImpl<VideoRecord>(videoRecords.getContent(), new PageRequest(page, size), videoRecords.getTotalElements());
         long likeNum = videoCollectService.countByUserId(userId);
         UserInfo userInfo = userInfoService.findUserInfo(userId);
         Map<String, Object> result = new HashMap<>();
-        result.put("videoRecords", videoRecords);
+        result.put("videoRecords", videoRecordPage);
         result.put("zanNum", userInfo.getZanNum());
         result.put("fanNum", userInfo.getFanNum());
         result.put("followNum", userInfo.getFollowNum());
         result.put("videoNum", videoRecords.getTotalElements());
         result.put("likeNum", likeNum);
+        return new ControllerResult().setRet_code(0).setRet_values(result).setMessage("");
+    }
+
+
+    /**
+     * 他人主页中我喜欢的视频
+     *
+     * @param version
+     * @param userId
+     * @return
+     */
+    @ApiOperation(value = "他人主页中我喜欢的视频")
+    @RequestMapping(value = "otherLike/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult otherLike(@PathVariable String version, @PathVariable String userId, int page, int size, String otherUserId) {
+        // 创建时间排序
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Page<VideoCollect> videoCollects = videoCollectService.findByUserId(otherUserId, new PageRequest(page, size, sort));
+        UserFollow userFollow = userFollowService.existFollow(userId, otherUserId);
+        boolean follow = false;
+        if (userFollow != null) {
+            follow = true;
+        }
+        List<VideoCollect> VideoCollectList = videoCollects.getContent();
+        if (VideoCollectList!= null && VideoCollectList.size() > 0) {
+            for(VideoCollect collect : VideoCollectList){
+                collect.getVideoRecord().setFollow(true);
+            }
+        }
+        PageImpl<VideoCollect> videoCollectPage = new PageImpl<VideoCollect>(VideoCollectList, new PageRequest(page, size), videoCollects.getTotalElements());
+        UserInfo userInfo = userInfoService.findUserInfo(otherUserId);
+        User user = userService.findOne(otherUserId);
+        long videoNum = videoService.countByUserId(otherUserId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("videoCollects", videoCollectPage);
+        result.put("zanNum", userInfo.getZanNum());
+        result.put("inviteCode", user.getInviteCode());
+        result.put("rongCloudToken", user.getRongCloudToken());
+        result.put("zanNum", userInfo.getZanNum());
+        result.put("fanNum", userInfo.getFanNum());
+        result.put("followNum", userInfo.getFollowNum());
+        result.put("videoNum", videoNum);
+        result.put("likeNum", videoCollects.getTotalElements());
+        result.put("follow", follow);
+
+        return new ControllerResult().setRet_code(0).setRet_values(result).setMessage("");
+    }
+
+    /**
+     * 他人主页中我的作品
+     *
+     * @param version
+     * @param userId
+     * @return
+     */
+    @ApiOperation(value = "他人主页中我的作品")
+    @RequestMapping(value = "otherVideo/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult otherVideo(@PathVariable String version, @PathVariable String userId, int page, int size, String otherUserId) {
+        // 创建时间排序
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Pageable pageable = new PageRequest(page, size, sort);
+        Page<VideoRecord> videoRecords = videoService.findByUser(otherUserId, pageable);
+        UserFollow userFollow = userFollowService.existFollow(userId, otherUserId);
+        Map<String, Object> result = new HashMap<>();
+        boolean follow = false;
+        if (userFollow != null) {
+            follow = true;
+        }
+        List<VideoRecord> videoRecordList = videoRecords.getContent();
+        if (videoRecordList!= null && videoRecordList.size() > 0) {
+             for(VideoRecord record : videoRecordList){
+                   record.setFollow(follow);
+             }
+        }
+        PageImpl<VideoRecord> videoRecordPage = new PageImpl<VideoRecord>(videoRecordList, new PageRequest(page, size), videoRecords.getTotalElements());
+        long likeNum = videoCollectService.countByUserId(otherUserId);
+        UserInfo userInfo = userInfoService.findUserInfo(otherUserId);
+        User user = userService.findOne(otherUserId);
+        result.put("videoRecords", videoRecordPage);
+        result.put("zanNum", userInfo.getZanNum());
+        result.put("fanNum", userInfo.getFanNum());
+        result.put("followNum", userInfo.getFollowNum());
+        result.put("videoNum", videoRecords.getTotalElements());
+        result.put("likeNum", likeNum);
+        result.put("inviteCode", user.getInviteCode());
+        result.put("rongCloudToken", user.getRongCloudToken());
+        result.put("follow", follow);
         return new ControllerResult().setRet_code(0).setRet_values(result).setMessage("");
     }
 

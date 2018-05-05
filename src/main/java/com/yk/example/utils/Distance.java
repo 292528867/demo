@@ -1,5 +1,8 @@
 package com.yk.example.utils;
 
+/**
+ * 距离计算
+ */
 public class Distance {
 
     private static final double EARTH_RADIUS = 6378.137;
