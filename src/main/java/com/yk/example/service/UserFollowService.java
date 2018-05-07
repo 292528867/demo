@@ -35,6 +35,9 @@ public class UserFollowService {
     @Autowired
     private VideoZanDao videoZanDao;
 
+    @Autowired
+    private PushSetDao pushSetDao;
+
     @Transactional(rollbackFor = Exception.class)
     public UserFollow save(UserFollow userFollow) {
         User followUser = userDao.findOne(userFollow.getFollowId());
@@ -67,13 +70,17 @@ public class UserFollowService {
         } else {
             userFollowDao.deleteByUserIdAndFollowId(userFollow.getUserId(), userFollow.getFollowId());
         }
-        // 对follow用户进行推送
-        if (userFollow.isStatus()) {
-            JPushUtils.sendAlias(user.getNickName() + "关注了您",
-                    Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
-        } else {
-            JPushUtils.sendAlias(user.getNickName() + "对您取消关注",
-                    Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
+
+        PushSet pushSet = pushSetDao.findByUserId(followUser.getUserId());
+        if (pushSet.isFollowPush()) {
+            // 对follow用户进行推送
+            if (userFollow.isStatus()) {
+                JPushUtils.sendAlias(user.getNickName() + "关注了您",
+                        Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
+            } else {
+                JPushUtils.sendAlias(user.getNickName() + "对您取消关注",
+                        Collections.singletonList(userFollow.getFollowId()), Collections.emptyMap());
+            }
         }
         return userFollow;
     }
@@ -117,9 +124,9 @@ public class UserFollowService {
                 if (videoRecordList != null && videoRecordList.size() > 0) {
                     VideoRecord videoRecord = videoRecordList.get(0);
                     videoRecord.setFollow(true);
-                    for (VideoZan videoZan : videoZanList){
-                        if(videoRecord.getId().equals(videoZan.getVideoRecord().getId())){
-                              videoRecord.setZan(true);
+                    for (VideoZan videoZan : videoZanList) {
+                        if (videoRecord.getId().equals(videoZan.getVideoRecord().getId())) {
+                            videoRecord.setZan(true);
                         }
                     }
                     videoRecords.add(videoRecord);

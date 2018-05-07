@@ -9,7 +9,9 @@ import com.yk.example.entity.ThirdUser;
 import com.yk.example.entity.User;
 import com.yk.example.entity.UserFollow;
 import com.yk.example.enums.UserType;
+import com.yk.example.rongCloud.RongCloud;
 import com.yk.example.rongCloud.models.response.TokenResult;
+import com.yk.example.rongCloud.models.user.UserModel;
 import com.yk.example.service.ThirdUserService;
 import com.yk.example.service.UserFollowService;
 import com.yk.example.service.UserInfoService;
@@ -70,6 +72,12 @@ public class UserController {
     @Value("${user_default_avatar_url}")
     private String userDefaultAvatarUrl;
 
+    @Value("${rongCloud.app_key}")
+    private String rongCloudAppKey;
+
+    @Value("${rongCloud.app_secret}")
+    private String rongCloudAppSecret;
+
     @Autowired
     private ThirdUserService thirdUserService;
 
@@ -81,7 +89,7 @@ public class UserController {
      */
     @ApiOperation(value = "用户注册", notes = "返回的用户实体")
     @RequestMapping(value = "/register/{version}", method = RequestMethod.POST)
-    public ControllerResult registerUser(@RequestBody User user, @PathVariable String version) {
+    public ControllerResult registerUser(@RequestBody User user, @PathVariable String version) throws Exception{
    /*     //有推荐人手机号
         String directRecommendUserPhone = user.getDirectRecommendUser();
         if (StringUtils.isNotBlank(directRecommendUserPhone)) {
@@ -139,7 +147,13 @@ public class UserController {
 
 
                 // 生成融云token
-                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), newUser.getNickName(), newUser.getHeadImgUrl());
+               RongCloud  rongCloud = RongCloud.getInstance(rongCloudAppKey, rongCloudAppSecret);
+                com.yk.example.rongCloud.methods.user.User rongCloudUser = rongCloud.user;
+                UserModel userModel = new UserModel()
+                        .setId(newUser.getUserId())
+                        .setName(newUser.getNickName())
+                        .setPortrait(newUser.getHeadImgUrl());
+                TokenResult tokenResult = rongCloudUser.register(userModel);
                 newUser.setRongCloudToken(tokenResult.getToken());
 
                 return new ControllerResult().setRet_code(0)
@@ -266,7 +280,7 @@ public class UserController {
      */
     @ApiOperation(value = "登录")
     @RequestMapping(value = "login/{version}", method = RequestMethod.POST)
-    public ControllerResult login(@RequestBody User login, @PathVariable String version) {
+    public ControllerResult login(@RequestBody User login, @PathVariable String version)throws Exception {
         String code = login.getCode();
         String phone = login.getPhone();
         String password = login.getPassword();
@@ -290,7 +304,13 @@ public class UserController {
                 login.setUserType(UserType.app);
                 User newUser = userService.insertUser(login);
                 // 生成融云token
-                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(newUser.getUserId(), newUser.getNickName(), newUser.getHeadImgUrl());
+                RongCloud  rongCloud = RongCloud.getInstance(rongCloudAppKey, rongCloudAppSecret);
+                com.yk.example.rongCloud.methods.user.User rongCloudUser = rongCloud.user;
+                UserModel userModel = new UserModel()
+                        .setId(newUser.getUserId())
+                        .setName(newUser.getNickName())
+                        .setPortrait(newUser.getHeadImgUrl());
+                TokenResult tokenResult = rongCloudUser.register(userModel);
                 newUser.setRongCloudToken(tokenResult.getToken());
                 return new ControllerResult().setRet_code(0).setRet_values(userService.insertUser(newUser)).setMessage("登陆成功");
             }
@@ -340,7 +360,7 @@ public class UserController {
      */
     @ApiOperation(value = "第三方登陆(绑定手机号)")
     @RequestMapping(value = "thirdLogin/{version}", method = RequestMethod.POST)
-    public ControllerResult thirdLogin(@RequestBody User thirdLogin, @PathVariable String version) {
+    public ControllerResult thirdLogin(@RequestBody User thirdLogin, @PathVariable String version) throws Exception{
         if ("1".equals(version)) {
             if (StringUtils.isBlank(thirdLogin.getNickName())) {
                 thirdLogin.setNickName(RandomStringUtils.randomNumeric(8));
@@ -352,7 +372,13 @@ public class UserController {
             if (user == null) {
                 user = userService.insertUser(thirdLogin);
                 // 生成融云token
-                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
+                RongCloud  rongCloud = RongCloud.getInstance(rongCloudAppKey, rongCloudAppSecret);
+                com.yk.example.rongCloud.methods.user.User rongCloudUser = rongCloud.user;
+                UserModel userModel = new UserModel()
+                        .setId(user.getUserId())
+                        .setName(user.getNickName())
+                        .setPortrait(user.getHeadImgUrl());
+                TokenResult tokenResult = rongCloudUser.register(userModel);
                 user.setRongCloudToken(tokenResult.getToken());
                 user = userService.insertUser(user);
             }
@@ -362,8 +388,11 @@ public class UserController {
         else if ("2".equals(version)) {
             String code = thirdLogin.getCode();
             String redisCode = redisTemplate.opsForValue().get(thirdLogin.getPhone() + "_bind");
+            if (StringUtils.isBlank(redisCode)) {
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("验证码错误");
+            }
             if (!redisCode.equals(code)) {
-                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("验证码错误");
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("验证码错误");
             }
             // 判断手机号是否已注册过
             User user = userService.findByPhone(thirdLogin.getPhone());
@@ -386,8 +415,8 @@ public class UserController {
                 // 判断用户图像头像和昵称是否需要改变
 
                 ThirdUser thirdUser1 = thirdUserService.findThirdUserByUserType(user, thirdLogin.getUserType());
-                if(thirdUser1 != null){
-                    return new ControllerResult().setRet_code(1).setRet_values("").setMessage("该手机号已绑定其他账号");
+                if (thirdUser1 != null) {
+                    return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("该手机号已绑定其他账号");
                 }
                 // 如果没有第三方用户 就添加一条记录并绑定userId
                 ThirdUser existThirdUser = thirdUserService.findThirdUser(thirdLogin.getThirdUserId());

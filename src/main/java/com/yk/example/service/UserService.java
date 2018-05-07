@@ -130,4 +130,21 @@ public class UserService {
     public User findByThirdId(String thirdUserId) {
         return userDao.findByThirdUserId(thirdUserId);
     }
+
+    public List<User> findAllUser() {
+        Specification<User> specification = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //所有的断言
+                List<Predicate> predicates = new ArrayList<>();
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+        return userDao.findAll(specification);
+    }
+
+    @Transactional
+    public void updateRongCloudTokenByUserId(String userId, String token) {
+        userDao.updateRongCloudTokenByUserId(userId,token);
+    }
 }

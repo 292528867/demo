@@ -1,6 +1,7 @@
 package com.yk.example.dao;
 
 import com.yk.example.entity.PushSet;
+import com.yk.example.entity.User;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
@@ -9,4 +10,5 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface PushSetDao extends CrudRepository<PushSet, String>, JpaSpecificationExecutor<PushSet> {
     PushSet findByUserId(String userId);
+
 }

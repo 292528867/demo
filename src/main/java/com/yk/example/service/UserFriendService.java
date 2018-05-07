@@ -9,6 +9,7 @@ import com.yk.example.entity.UserFollow;
 import com.yk.example.entity.UserFriend;
 import com.yk.example.enums.FriendStatus;
 import com.yk.example.utils.JPushUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,9 +41,11 @@ public class UserFriendService {
         List<UserFollow> fanList = userFollowDao.findByFollowIdAndStatus(userId, true);*/
         List<SearchUserDto> dtos = new ArrayList<>();
         for (User user : cowList){
-            if(userId.equals(user.getUserId())){
-                cowList.remove(user);
-                break;
+            if(StringUtils.isNoneBlank(userId)){
+                if(userId.equals(user.getUserId())){
+                    cowList.remove(user);
+                    break;
+                }
             }
             UserFollow userFollow = userFollowDao.findByUserIdAndFollowId(userId, user.getUserId());
             UserFollow fan = userFollowDao.findByUserIdAndFollowId(user.getUserId(), userId);

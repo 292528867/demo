@@ -43,7 +43,7 @@ public class VideoManageController {
             pageCurrent = 1;
         }
         if (pageSize == 0) {
-            pageSize = 10;
+            pageSize = 20;
         }
         Page<VideoRecord> videoRecordPage = videoService.findAllPage(videoRecord, new PageRequest(pageCurrent - 1, pageSize));
         model.addAttribute("videoList", videoRecordPage.getContent());

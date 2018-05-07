@@ -333,8 +333,8 @@ public class VideoController {
      * @return
      */
     @ApiOperation(value = "他人主页中我喜欢的视频")
-    @RequestMapping(value = "otherLike/{userId}/{version}", method = RequestMethod.GET)
-    public ControllerResult otherLike(@PathVariable String version, @PathVariable String userId, int page, int size, String otherUserId) {
+    @RequestMapping(value = "otherLike/{version}", method = RequestMethod.GET)
+    public ControllerResult otherLike(@PathVariable String version, String userId, int page, int size, String otherUserId) {
         // 创建时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Page<VideoCollect> videoCollects = videoCollectService.findByUserId(otherUserId, new PageRequest(page, size, sort));
@@ -376,8 +376,8 @@ public class VideoController {
      * @return
      */
     @ApiOperation(value = "他人主页中我的作品")
-    @RequestMapping(value = "otherVideo/{userId}/{version}", method = RequestMethod.GET)
-    public ControllerResult otherVideo(@PathVariable String version, @PathVariable String userId, int page, int size, String otherUserId) {
+    @RequestMapping(value = "otherVideo/{version}", method = RequestMethod.GET)
+    public ControllerResult otherVideo(@PathVariable String version, String userId, int page, int size, String otherUserId) {
         // 创建时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         Pageable pageable = new PageRequest(page, size, sort);

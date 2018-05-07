@@ -37,8 +37,8 @@ public class UserFriendController {
      * @return
      */
     @ApiOperation("搜索用户")
-    @RequestMapping(value = "searchUser/{userId}/{version}",method = RequestMethod.GET)
-    public ControllerResult searchFriend(@PathVariable String version ,@PathVariable String userId, String nickName){
+    @RequestMapping(value = "searchUser/{version}",method = RequestMethod.GET)
+    public ControllerResult searchFriend(@PathVariable String version , String userId, String nickName){
         List<SearchUserDto> searchUserDtos = userFriendService.searchFriend(userId,nickName);
         return new ControllerResult().setRet_code(0).setRet_values(searchUserDtos).setMessage("");
     }

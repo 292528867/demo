@@ -1,8 +1,10 @@
 package com.yk.example.controller;
 
 import com.yk.example.dto.ControllerResult;
+import com.yk.example.dto.VideoCommentDto;
 import com.yk.example.entity.VideoComment;
 import com.yk.example.entity.VideoCommentZan;
+import com.yk.example.enums.ZanStatus;
 import com.yk.example.service.VideoCommentService;
 import com.yk.example.service.VideoCommentZanService;
 import io.swagger.annotations.ApiOperation;
@@ -11,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.Controller;
-
-import java.util.List;
 
 /**
  * Created by yk on 2018/4/4.
@@ -56,9 +55,15 @@ public class VideoCommentController {
      */
     @ApiOperation(value = "查询视频的评论列表")
     @RequestMapping(value = "findComment/{videoId}/{version}", method = RequestMethod.GET)
-    public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version,int page ,int size,String userId) {
-        Page<VideoComment> videoCommentPage = videoCommentService.findAllByVideoId(videoId,new PageRequest(page,size),userId);
-        return new ControllerResult().setRet_code(0).setRet_values(videoCommentPage).setMessage("");
+    public ControllerResult findComment(@PathVariable String videoId, @PathVariable String version, int page, int size, String userId) throws Exception {
+        if ("1".equals(version)) {
+            Page<VideoComment>   videoCommentPage = videoCommentService.findAllByVideoId(videoId, new PageRequest(page, size));
+            return new ControllerResult().setRet_code(0).setRet_values(videoCommentPage).setMessage("");
+        } else if ("2".equals(version)) {
+            Page<VideoCommentDto>   videoCommentPage = videoCommentService.findAllByVideoIdV2(videoId, new PageRequest(page, size), userId);
+            return new ControllerResult().setRet_code(0).setRet_values(videoCommentPage).setMessage("");
+        }
+        return null;
     }
 
     /**
@@ -69,9 +74,15 @@ public class VideoCommentController {
      * @return
      */
     @ApiOperation(value = "对评论进行点赞或者取消点赞")
-    @RequestMapping(value = "commentZan/{version}",method = RequestMethod.POST)
+    @RequestMapping(value = "commentZan/{version}", method = RequestMethod.POST)
     public ControllerResult commentZan(@RequestBody VideoCommentZan videoCommentZan, @PathVariable String version) {
         if (StringUtils.isNotBlank(videoCommentZan.getUser().getUserId())) {
+            if (videoCommentZan.getZanStatus().equals(ZanStatus.zan)) {
+                VideoCommentZan commentZan = videoCommentZanService.findByUserAndComment(videoCommentZan.getUser(), videoCommentZan.getComment());
+                if (commentZan != null) {
+                    return new ControllerResult().setRet_code(1).setRet_values("").setMessage("已经点赞过，无需再点赞");
+                }
+            }
             videoCommentZanService.zan(videoCommentZan);
             return new ControllerResult().setRet_code(0).setRet_values("").setMessage("");
         }
@@ -79,7 +90,8 @@ public class VideoCommentController {
     }
 
     /**
-     *  评论的接口
+     * 评论的接口
+     *
      * @param version
      * @param userId
      * @param page
@@ -87,9 +99,9 @@ public class VideoCommentController {
      * @return
      */
     @ApiOperation(value = "评论的接口")
-    @RequestMapping(value = "allComment/{userId}/{version}",method = RequestMethod.GET)
-    public ControllerResult allComment(@PathVariable String version,@PathVariable String userId,int page ,int size){
-        Page<VideoComment> commentPage = videoCommentService.findAllCommentByUser(userId,new PageRequest(page,size));
+    @RequestMapping(value = "allComment/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult allComment(@PathVariable String version, @PathVariable String userId, int page, int size) {
+        Page<VideoComment> commentPage = videoCommentService.findAllCommentByUser(userId, new PageRequest(page, size));
         return new ControllerResult().setRet_code(0).setRet_values(commentPage).setMessage("");
     }
 }

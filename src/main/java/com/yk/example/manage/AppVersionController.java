@@ -2,6 +2,7 @@ package com.yk.example.manage;
 
 import com.yk.example.entity.AppVersion;
 import com.yk.example.service.AppVersionService;
+import com.yk.example.service.UserService;
 import com.yk.example.utils.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class AppVersionController {
 
     @Autowired
     private AppVersionService appVersionService;
+
 
     @Value("${apk.path}")
     private String apkPath;
@@ -96,4 +98,6 @@ public class AppVersionController {
         }
         return "redirect:versionList_0_0_0";
     }
+
+
 }

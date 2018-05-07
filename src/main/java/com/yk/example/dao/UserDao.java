@@ -43,4 +43,7 @@ public interface UserDao extends CrudRepository<User, String>, JpaSpecificationE
     User findByThirdUserId(String thirdUserId);
 
     List<User> findByNickNameLike(String nickName);
+
+    @Query("update User u set u.rongCloudToken = ?2  where  u.userId =?1")
+    void updateRongCloudTokenByUserId(String userId, String token);
 }

@@ -232,7 +232,7 @@ public class VideoService {
                 if (StringUtils.isNoneBlank(videoRecord.getVideoUrl())) {
                     predicates.add(criteriaBuilder.like(root.get("videoUrl").as(String.class), videoRecord.getVideoUrl() + "%"));
                 }
-                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class), "0"));
+//                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class), "0"));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };

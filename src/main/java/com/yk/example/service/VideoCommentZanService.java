@@ -6,7 +6,6 @@ import com.yk.example.dao.VideoCommentZanDao;
 import com.yk.example.dao.ZanRecordHistoryDao;
 import com.yk.example.entity.*;
 import com.yk.example.enums.ZanStatus;
-import com.yk.example.enums.ZanType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,26 +37,19 @@ public class VideoCommentZanService {
         int zanNum = videoComment.getZanNum();
         if (ZanStatus.zan.equals(videoCommentZan.getZanStatus())) {
             zanNum++;
+            // 保存点赞记录
+            videoCommentZanDao.save(videoCommentZan);
         } else {
             zanNum--;
+            // 删除点赞记录
+            videoCommentZanDao.deleteByUserAndComment(videoCommentZan.getUser(),videoCommentZan.getComment());
         }
         videoCommentDao.updateZanNum(zanNum, commentId);
-        // 保存点赞记录
-        VideoRecord videoRecord = videoCommentZan.getComment().getVideoRecord();
-        ZanRecordHistory zanRecordHistory = new ZanRecordHistory();
-        zanRecordHistory.setZanType(ZanType.comment);
-        zanRecordHistory.setZanStatus(videoCommentZan.getZanStatus());
-        zanRecordHistory.setVideoId(videoRecord.getId());
-        zanRecordHistory.setCommentId(commentId);
-        zanRecordHistory.setVideoImgUrl(videoRecord.getVideoImgUrl());
-        // 被点赞人id
-        zanRecordHistory.setToUserId(videoCommentZan.getUser().getUserId());
-        // 点赞人的信息
-        User user = userDao.findOne(videoCommentZan.getUser().getUserId());
-        zanRecordHistory.setFromUserId(user.getUserId());
-        zanRecordHistory.setNickName(user.getNickName());
-        zanRecordHistory.setHeadImgUrl(user.getHeadImgUrl());
-        zanRecordHistoryDao.save(zanRecordHistory);
+
         return 0;
+    }
+
+    public VideoCommentZan findByUserAndComment(User user, VideoComment comment) {
+        return videoCommentZanDao.findByUserAndComment(user,comment);
     }
 }

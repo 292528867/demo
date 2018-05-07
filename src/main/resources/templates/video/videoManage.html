@@ -41,7 +41,7 @@
                             <form action="videoList_0_0_0">
                                 <div class="row">
                                     <div class="col-sm-3 m-b-xs">
-                                        <input name="videoUrl" value="" th:value="${video.videoUrl}"
+                                        <input id="videoUrl" name="videoUrl" value="" th:value="${video.videoUrl}"
                                                placeholder="阿里云的视频id"
                                                class="form-control" type="text"/>
                                     </div>
@@ -108,11 +108,19 @@
                                             <p th:case="'app'">被屏蔽</p>
                                             <p th:case="'wb'">用户删除</p>
                                         </td>-->
-                                        <td>
+                                        <td th:if="${nc.flag} == '0' ">
                                             <a href="#" th:onclick="'javascript:shieldVideo(\''+${nc.id}+'\',\'1\')'" title="审核通过"><i
-                                                    class="fa fa-edit text-navy"></i></a>
+                                                    class="fa fa-edit text-navy"></i>审核通过</a>
                                             <a href="#" th:onclick="'javascript:shieldVideo(\''+${nc.id}+'\',\'2\')'" title="屏蔽"><i
-                                                    class="fa fa-trash-o text-navy"></i></a>
+                                                    class="fa fa-trash-o text-navy">屏蔽</i></a>
+                                        </td>
+                                        <td th:if="${nc.flag} == '1'">
+                                            <a href="#" th:onclick="'javascript:shieldVideo(\''+${nc.id}+'\',\'2\')'" title="屏蔽"><i
+                                                    class="fa fa-trash-o text-navy">屏蔽</i></a>
+                                        </td>
+                                        <td th:if="${nc.flag} == '2'">
+                                            <a href="#" th:onclick="'javascript:shieldVideo(\''+${nc.id}+'\',\'1\')'" title="屏蔽"><i
+                                                    class="fa fa-trash-o text-navy">审核通过</i></a>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -167,6 +175,10 @@
     var pageHTML = [[${pageHTML}]];
     $(document).ready(function () {
         $("#pageHTML").html(pageHTML);
+
+        $('#videoUrl').focus(function () {
+            $('#videoUrl').val("");
+        });
 
     });
 

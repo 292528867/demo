@@ -34,6 +34,9 @@ public class VideoZanService {
     @Autowired
     private UserInfoDao userInfoDao;
 
+    @Autowired
+    private PushSetDao pushSetDao;
+
     @Transactional(rollbackFor = Exception.class)
     public VideoZan save(VideoZan videoZan) {
         String videoId = videoZan.getVideoRecord().getId();
@@ -53,6 +56,8 @@ public class VideoZanService {
         userInfo.setZanNum(userZanNum);
         userInfoDao.save(userInfo);
 
+
+        PushSet pushSet = pushSetDao.findByUserId(videoRecord.getUser().getUserId());
         // 点赞人的信息
         User user = userDao.findOne(videoZan.getUser().getUserId());
         // 对被点赞人进行推送
@@ -70,13 +75,17 @@ public class VideoZanService {
             zanRecordHistory.setNickName(user.getNickName());
             zanRecordHistory.setHeadImgUrl(user.getHeadImgUrl());
             zanRecordHistoryDao.save(zanRecordHistory);
-            JPushUtils.sendAlias(user.getNickName() + "点赞您的视频",
-                    Collections.singletonList(videoRecord.getUser().getUserId()), Collections.singletonMap("videoId", videoRecord.getId()));
+            if(pushSet.isZanPush()){
+                JPushUtils.sendAlias(user.getNickName() + "点赞您的视频",
+                        Collections.singletonList(videoRecord.getUser().getUserId()), Collections.singletonMap("videoId", videoRecord.getId()));
+            }
         } else {
             videoZanDao.deleteByUserAndVideoRecord(user, videoRecord);
             zanRecordHistoryDao.deleteByVideoIdAndFromUserId(videoId, videoZan.getUser().getUserId());
-            JPushUtils.sendAlias(user.getNickName() + "取消点赞您的视频",
-                    Collections.singletonList(videoRecord.getUser().getUserId()), Collections.singletonMap("videoId", videoRecord.getId()));
+            if(pushSet.isZanPush()){
+                JPushUtils.sendAlias(user.getNickName() + "取消点赞您的视频",
+                        Collections.singletonList(videoRecord.getUser().getUserId()), Collections.singletonMap("videoId", videoRecord.getId()));
+            }
         }
         return null;
     }
