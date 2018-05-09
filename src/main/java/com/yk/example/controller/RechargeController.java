@@ -54,6 +54,9 @@ public class RechargeController {
     @Value("${spring.profiles.active}")
     private String profilesActive;
 
+    @Value("${aliNotifyUrl}")
+    private String aliNotifyUrl;
+
     /**
      * 支付宝充值
      *
@@ -84,7 +87,7 @@ public class RechargeController {
         }
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setBizModel(model);
-        request.setNotifyUrl(aliConfig.getNotifyUrl());
+        request.setNotifyUrl(aliNotifyUrl);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);

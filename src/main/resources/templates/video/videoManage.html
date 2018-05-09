@@ -41,8 +41,13 @@
                             <form action="videoList_0_0_0">
                                 <div class="row">
                                     <div class="col-sm-3 m-b-xs">
-                                        <input id="videoUrl" name="videoUrl" value="" th:value="${video.videoUrl}"
-                                               placeholder="阿里云的视频id"
+                                        <input id="title" name="title" value="" th:value="${video.title}"
+                                               placeholder="视频标题"
+                                               class="form-control" type="text"/>
+                                    </div>
+                                    <div class="col-sm-3 m-b-xs">
+                                        <input id="phone" name="phone" value="" th:value="${phone}"
+                                               placeholder="手机号"
                                                class="form-control" type="text"/>
                                     </div>
 
@@ -54,12 +59,16 @@
                                 </div>
                             </form>
                             <div class="row">
-                                <div class="col-sm-6 m-b-xs">
+                                <div class="col-sm-3 m-b-xs">
                                     <a th:href="@{toVideoImport}" class="btn btn-white btn-sm" data-toggle="tooltip"
                                        data-placement="left" title="" data-original-title="Refresh inbox"><i
                                             class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;导入视频&nbsp;&nbsp;&nbsp;&nbsp;</a>
                                 </div>
-                                <div class="col-sm-6 m-b-xs"></div>
+                                <div class="col-sm-6 m-b-xs">
+                                    <input type="hidden" id="statusHidden" th:value="${status}">
+                                    <label><input id="firstCheck" type="radio" value="0" name="optionsRadios">先审后发</label>
+                                    <label> <input id="firstPublish" type="radio"  value="1"  name="optionsRadios">先发后审</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -176,8 +185,34 @@
     $(document).ready(function () {
         $("#pageHTML").html(pageHTML);
 
-        $('#videoUrl').focus(function () {
-            $('#videoUrl').val("");
+        $('#title').focus(function () {
+            $('#title').val("");
+        });
+        $('#phone').focus(function () {
+            $('#phone').val("");
+        });
+
+        var statusValue = $("#statusHidden").val();
+        if(statusValue === '0'){
+            $("#firstCheck").attr("checked", "checked");
+        }else {
+            $("#firstPublish").attr("checked", "checked");
+        }
+        // 改变先审后发的全局配置
+        $("input[type=radio]").change(function () {
+            var checkValue = $('input[type=radio]:checked').val();
+            $.ajax({
+                type: "POST",
+                url: "setFirstCheckOrPublish?value="+checkValue,
+                success: function (msg) {
+                    if(msg.ret_code === 0){
+                        console.log("配置成功");
+                    }
+                },
+                error: function () {
+                    alert("系统异常！");
+                }
+            });
         });
 
     });

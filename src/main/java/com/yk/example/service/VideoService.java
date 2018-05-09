@@ -8,8 +8,11 @@ import com.yk.example.utils.Distance;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +53,9 @@ public class VideoService {
 
     @Value("${video.url}")
     private String videoUrl;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
 
     public List<VideoRecord> nearby(double longitude, double latitude, int page, int size) {
@@ -141,13 +147,13 @@ public class VideoService {
                 }
                 if (videoZanList != null && videoZanList.size() > 0) {
                     for (VideoZan videoZan : videoZanList) {
-                       if (videoZan.getVideoRecord().getId().equals(videoRecord.getId())){
+                        if (videoZan.getVideoRecord().getId().equals(videoRecord.getId())) {
                             videoRecord.setZan(true);
-                           zanFlag = true;
-                       }
+                            zanFlag = true;
+                        }
                     }
                 }
-                if(!zanFlag){
+                if (!zanFlag) {
                     videoRecord.setZan(false);
                 }
             }
@@ -193,7 +199,12 @@ public class VideoService {
 
     public VideoRecord save(VideoRecord videoRecord) {
         // 发布短视频
-        videoRecord.setFlag("1");
+        String flag = redisTemplate.opsForValue().get("video_first_check_or_publish");
+        if(StringUtils.isNoneBlank(flag)){
+             videoRecord.setFlag(flag);
+        }else {
+            videoRecord.setFlag("1");
+        }
         return videoDao.save(videoRecord);
     }
 
@@ -230,7 +241,14 @@ public class VideoService {
                 //所有的断言
                 List<Predicate> predicates = new ArrayList<>();
                 if (StringUtils.isNoneBlank(videoRecord.getVideoUrl())) {
-                    predicates.add(criteriaBuilder.like(root.get("videoUrl").as(String.class), videoRecord.getVideoUrl() + "%"));
+                    predicates.add(criteriaBuilder.like(root.get("videoUrl").as(String.class), "%" + videoRecord.getVideoUrl() + "%"));
+                }
+                if (StringUtils.isNoneBlank(videoRecord.getTitle())) {
+                    predicates.add(criteriaBuilder.like(root.get("title").as(String.class), "%" + videoRecord.getTitle() + "%"));
+                }
+                if (videoRecord.getUser() != null) {
+                    predicates.add(criteriaBuilder.equal(root.get("user").as(User.class), videoRecord.getUser()));
+//                    SetJoin<VideoRecord, User> userJoin = root.getModel().getSingularAttribute("user", User.class);
                 }
 //                predicates.add(criteriaBuilder.equal(root.get("flag").as(String.class), "0"));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
