@@ -26,4 +26,6 @@ public interface UserFollowDao extends CrudRepository<UserFollow, String>, JpaSp
 
 
     UserFollow findByUserIdAndFollowId(String userId, String followId);
+
+    List<UserFollow> findByFollowIdAndStatusOrderByCreateTimeDesc(String userId, boolean b);
 }

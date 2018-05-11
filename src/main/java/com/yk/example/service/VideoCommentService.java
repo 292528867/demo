@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +95,7 @@ public class VideoCommentService {
         return new PageImpl<VideoCommentDto>(videoCommentDtoList,pageable,videoCommentPage.getTotalElements());
     }
 
-    public Page<VideoComment> findAllCommentByUser(String userId, Pageable pageable) {
+    public Page<VideoComment> findAllCommentByUser(String userId,PageRequest pageable) {
         User user = new User();
         user.setUserId(userId);
         List<VideoRecord> videoRecords = videoDao.findByUserAndFlag(user, "1");

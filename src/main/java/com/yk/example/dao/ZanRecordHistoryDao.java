@@ -15,4 +15,6 @@ public interface ZanRecordHistoryDao extends CrudRepository<ZanRecordHistory, St
     List<ZanRecordHistory> findByToUserId(String userId);
 
     void deleteByVideoIdAndFromUserId(String videoId, String userId);
+
+    List<ZanRecordHistory> findByToUserIdOrderByCreateTimeDesc(String userId);
 }

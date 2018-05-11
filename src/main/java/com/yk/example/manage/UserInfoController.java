@@ -103,15 +103,17 @@ public class UserInfoController {
         for (User user : users) {
             // 生成融云token
             // 生成融云token
-            RongCloud rongCloud = RongCloud.getInstance(rongCloudAppKey, rongCloudAppSecret);
-            com.yk.example.rongCloud.methods.user.User rongCloudUser = rongCloud.user;
-            UserModel userModel = new UserModel()
-                    .setId(user.getUserId())
-                    .setName(user.getNickName())
-                    .setPortrait(user.getHeadImgUrl());
-            TokenResult tokenResult = rongCloudUser.register(userModel);
-            user.setRongCloudToken(tokenResult.getToken());
-            userService.insertUser(user);
+           if(StringUtils.isBlank(user.getRongCloudToken())){
+               RongCloud rongCloud = RongCloud.getInstance(rongCloudAppKey, rongCloudAppSecret);
+               com.yk.example.rongCloud.methods.user.User rongCloudUser = rongCloud.user;
+               UserModel userModel = new UserModel()
+                       .setId(user.getUserId())
+                       .setName(user.getNickName())
+                       .setPortrait(user.getHeadImgUrl());
+               TokenResult tokenResult = rongCloudUser.register(userModel);
+               user.setRongCloudToken(tokenResult.getToken());
+               userService.insertUser(user);
+           }
         }
         return "success";
     }

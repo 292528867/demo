@@ -11,7 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -101,7 +103,9 @@ public class VideoCommentController {
     @ApiOperation(value = "评论的接口")
     @RequestMapping(value = "allComment/{userId}/{version}", method = RequestMethod.GET)
     public ControllerResult allComment(@PathVariable String version, @PathVariable String userId, int page, int size) {
-        Page<VideoComment> commentPage = videoCommentService.findAllCommentByUser(userId, new PageRequest(page, size));
-        return new ControllerResult().setRet_code(0).setRet_values(commentPage).setMessage("");
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Page<VideoComment> commentPage = videoCommentService.findAllCommentByUser(userId, new PageRequest(page, size,sort));
+        Page<VideoComment> resultPage = new PageImpl<VideoComment>(commentPage.getContent(), new PageRequest(page, size), commentPage.getTotalElements());
+        return new ControllerResult().setRet_code(0).setRet_values(resultPage).setMessage("");
     }
 }

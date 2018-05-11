@@ -4,13 +4,10 @@ import com.yk.example.dao.*;
 import com.yk.example.dto.FansDto;
 import com.yk.example.entity.*;
 import com.yk.example.utils.BeanSort;
-import com.yk.example.utils.Distance;
 import com.yk.example.utils.JPushUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.*;
 
@@ -89,7 +86,8 @@ public class UserFollowService {
     public List<FansDto> fanList(String userId) {
         List<FansDto> fansDtos = new ArrayList<>();
         //  粉丝用户列表
-        List<UserFollow> fans = userFollowDao.findByFollowIdAndStatus(userId, true);
+//        List<UserFollow> fans = userFollowDao.findByFollowIdAndStatus(userId, true);
+        List<UserFollow> fans = userFollowDao.findByFollowIdAndStatusOrderByCreateTimeDesc(userId, true);
         // 你关注的用户
         List<String> userFollows = userFollowDao.findByUserId(userId, true);
         if (fans != null && fans.size() > 0) {

@@ -122,7 +122,7 @@ public class UserController {
         // 验证码校验
         String redisCode = redisTemplate.opsForValue().get(user.getPhone() + "_reg");
         String code = user.getCode();
-        if (StringUtils.isNoneBlank(redisCode)) {
+        if (StringUtils.isNotBlank(redisCode)) {
             if (redisCode.equals(code)) {
 
                 // 密码进行md5加密
@@ -288,8 +288,11 @@ public class UserController {
         // 验证码登陆
         if (StringUtils.isNotBlank(code)) {
             String redisCode = redisTemplate.opsForValue().get(login.getPhone() + "_login");
+            if(StringUtils.isBlank(redisCode)){
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("验证码错误");
+            }
             if (!redisCode.equals(code)) {
-                return new ControllerResult().setRet_code(1).setRet_values("").setMessage("验证码错误");
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("验证码错误");
             }
             // 判断是否注册
             user = userService.findByPhone(phone);
@@ -325,6 +328,9 @@ public class UserController {
             user = userService.findByPhone(phone);
             if (user == null) {
                 return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("用户不存在");
+            }
+            if(StringUtils.isBlank(user.getPassword())){
+                return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("该账号还没有设置密码，请用其他登陆方式");
             }
             if (!user.getPassword().equals(Md5Utlls.getMD5String(password))) {
                 return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("密码错误");
@@ -399,7 +405,13 @@ public class UserController {
             if (user == null) {
                 user = userService.insertUser(thirdLogin);
                 // 生成融云token
-                TokenResult tokenResult = RongCloudUtils.registerRongCloudUser(user.getUserId(), user.getNickName(), user.getHeadImgUrl());
+                RongCloud  rongCloud = RongCloud.getInstance(rongCloudAppKey, rongCloudAppSecret);
+                com.yk.example.rongCloud.methods.user.User rongCloudUser = rongCloud.user;
+                UserModel userModel = new UserModel()
+                        .setId(user.getUserId())
+                        .setName(user.getNickName())
+                        .setPortrait(user.getHeadImgUrl());
+                TokenResult tokenResult = rongCloudUser.register(userModel);
                 user.setRongCloudToken(tokenResult.getToken());
                 user = userService.insertUser(user);
                 ThirdUser thirdUser = new ThirdUser();
