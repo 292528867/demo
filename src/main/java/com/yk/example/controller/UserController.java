@@ -574,11 +574,16 @@ public class UserController {
     @ApiOperation(value = "关注用户")
     @RequestMapping(value = "followUser/{version}", method = RequestMethod.POST)
     public ControllerResult followUser(@RequestBody UserFollow userFollow, @PathVariable String version) {
+        UserFollow follow = userFollowService.existFollow(userFollow);
         if (userFollow.isStatus()) {
-            UserFollow follow = userFollowService.existFollow(userFollow);
             if (follow != null) {
                 return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("已关注该用户");
             }
+        }
+        if(!userFollow.isStatus()){
+           if(follow == null){
+               return new ControllerResult().setRet_code(1).setRet_values(Collections.emptyMap()).setMessage("您还没有关注该用户");
+           }
         }
         UserFollow userFollow1 = userFollowService.save(userFollow);
         return new ControllerResult().setRet_code(0).setRet_values(userFollow1).setMessage("");

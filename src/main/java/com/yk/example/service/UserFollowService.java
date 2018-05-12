@@ -143,4 +143,38 @@ public class UserFollowService {
     public UserFollow existFollow(String userId, String otherUserId) {
         return userFollowDao.findByUserIdAndFollowId(userId, otherUserId);
     }
+
+    public long countFanNum(String userId) {
+        return userFollowDao.countByFollowId(userId);
+    }
+
+    public long countFollowNum(String userId) {
+        return userFollowDao.countByUserId(userId);
+    }
+
+    public List<FansDto> followList(String userId) {
+        List<FansDto> followDtos = new ArrayList<>();
+        List<UserFollow> follows = userFollowDao.findByUserIdAndStatusOrderByCreateTimeDesc(userId, true);
+        // 你的粉丝
+        List<String> fans = userFollowDao.findByFollowId(userId, true);
+        if (follows != null && follows.size() > 0) {
+            for (UserFollow u : follows) {
+                FansDto dto = new FansDto();
+                User user = userDao.findOne(u.getFollowId());
+                dto.setCreateTime(u.getCreateTime());
+                dto.setHeadImgUrl(user.getHeadImgUrl());
+                dto.setNickName(user.getNickName());
+                dto.setFollowId(user.getUserId());
+                //  判断是否是你的粉丝
+                if (fans.contains(user.getUserId())) {
+                    dto.setFollow(true);
+                } else {
+                    dto.setFollow(false);
+                }
+                followDtos.add(dto);
+            }
+        }
+
+        return followDtos;
+    }
 }

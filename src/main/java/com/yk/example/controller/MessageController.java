@@ -50,6 +50,19 @@ public class MessageController {
     }
 
     /**
+     *  关注列表(点击关注数目)
+     * @param userId
+     * @param version
+     * @return
+     */
+    @ApiOperation(value = "关注列表(点击关注数目)")
+    @RequestMapping(value = "followList/{userId}/{version}", method = RequestMethod.GET)
+    public ControllerResult followList(@PathVariable String userId, @PathVariable String version){
+        List<FansDto> followDtos = userFollowService.followList(userId);
+        return new ControllerResult().setRet_code(0).setRet_values(followDtos).setMessage("");
+    }
+
+    /**
      * 点赞消息列表
      *
      * @param userId
